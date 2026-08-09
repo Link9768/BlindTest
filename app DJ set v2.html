@@ -62,8 +62,11 @@
           transparent 0px, transparent 16px,
           rgba(120, 180, 255, 0.05) 16px, rgba(120, 180, 255, 0.05) 18px),
         radial-gradient(circle at 50% 30%, #0a4a8a 0%, var(--blue) 40%, var(--darkblue) 100%);
-      justify-content: center;
+      justify-content: flex-start;
       gap: 30px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 30px 0;
     }
 
     #themes-grid {
