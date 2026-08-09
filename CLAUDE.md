@@ -23,7 +23,9 @@ Renseignés : **Créature** (partiel), **Animaux** ✅, **Météo/Saisons** ✅,
 
 ### Bouton "+ d'infos"
 
-Chaque morceau peut avoir un champ `artiste` (et `titre` optionnel si `reponse` n'est pas déjà le titre). Quand présent, un bouton "+ d'infos" apparaît sous le bandeau réponse une fois celle-ci révélée ; au clic, affiche titre + artiste dans une bulle. Absent des thèmes Créature/Animaux (pas de titre/artiste connu, réponse = nom de l'élément à deviner).
+**Obligatoire pour tout nouveau morceau ajouté** : chaque entrée `morceaux[]` doit avoir un champ `artiste` (et `titre` si `reponse` n'est pas déjà le titre de la chanson). Le bouton "+ d'infos" apparaît automatiquement sous le bandeau réponse dès que `artiste` est renseigné ; au clic, affiche titre + artiste dans une bulle. Si le titre/artiste n'est pas donné par l'utilisateur, le récupérer via WebFetch sur `open.spotify.com/track/{id}` (page publique, meta og:title fiable) plutôt que de l'inventer.
+
+Tous les thèmes remplis (Créature, Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Hommes et Femmes 1-2) ont ce champ à jour.
 
 ### Thème Animaux — morceaux (complet ✅)
 
