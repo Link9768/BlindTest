@@ -19,7 +19,7 @@ Application web mobile (fichier HTML unique) utilisée pendant un DJ set comme o
 ### Thèmes (10)
 
 Créature, Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Chanteur, Réalisateur, Groupe, Film, Série, Pays, Sport, Décennie, Hommes et Femmes 1-4 (17).
-Renseignés : **Créature** (partiel), **Animaux** ✅, **Météo/Saisons** ✅, **Chiffre/Nombre** (6/7), **Partie du corps** ✅. Les autres ont 7 slots placeholder (`reponse: '?'`, `spotifyId: ''`) à remplir dans le tableau `themes` du JS.
+Renseignés : **Créature** (partiel), **Animaux** ✅, **Météo/Saisons** ✅, **Chiffre/Nombre** (6/7), **Partie du corps** ✅, **Hommes et Femmes 1** ✅, **Hommes et Femmes 2** (6/7). Les autres ont 7 slots placeholder (`reponse: '?'`, `spotifyId: ''`) à remplir dans le tableau `themes` du JS.
 
 ### Thème Animaux — morceaux (complet ✅)
 
