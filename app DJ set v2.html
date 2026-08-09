@@ -354,6 +354,55 @@
     #btn-suivant:hover { opacity: 1; }
     #btn-suivant .arrow { font-size: 1.3rem; }
     #btn-suivant:disabled { opacity: 0.3; cursor: default; }
+
+    /* ─── + d'infos (bulle avec titre + artiste) ─── */
+    #btn-infos {
+      position: absolute;
+      right: 30px;
+      bottom: 96px;
+      background: var(--blue);
+      border: 2px solid #4a90c2;
+      border-radius: 20px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 8px 16px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      z-index: 6;
+    }
+    #btn-infos.visible { display: flex; }
+    #btn-infos::after {
+      content: '';
+      position: absolute;
+      bottom: -8px; right: 22px;
+      width: 14px; height: 14px;
+      background: var(--blue);
+      border-right: 2px solid #4a90c2;
+      border-bottom: 2px solid #4a90c2;
+      transform: rotate(45deg);
+    }
+
+    #infos-popup {
+      position: absolute;
+      right: 30px;
+      bottom: 138px;
+      max-width: 260px;
+      background: var(--darkblue);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      text-align: right;
+      display: none;
+      z-index: 6;
+    }
+    #infos-popup.visible { display: block; }
+    #infos-popup .titre { font-weight: 900; display: block; }
+    #infos-popup .artiste { opacity: 0.7; font-size: 0.8rem; }
   </style>
 </head>
 <body>
@@ -394,6 +443,12 @@
       </div>
       <div id="no-track">🚫</div>
     </div>
+
+    <div id="infos-popup">
+      <span class="titre" id="infos-titre"></span>
+      <span class="artiste" id="infos-artiste"></span>
+    </div>
+    <button id="btn-infos" onclick="toggleInfos()">+ d'infos</button>
 
     <div id="nav-bar">
       <span id="progress-text"></span>
@@ -439,37 +494,37 @@
       {
         nom: 'Météo/Saisons', couleur: '#fecd4f',
         morceaux: [
-          { num: 1, reponse: 'SOLEIL',   spotifyId: '6dGnYIeXmHdcikdzNNDMm2' }, // Here Comes the Sun — Beatles
-          { num: 2, reponse: 'PLUIE',    spotifyId: '1uvyZBs4IZYRebHIB1747m' }, // Purple Rain — Prince
-          { num: 3, reponse: 'ORAGE',    spotifyId: '14XWXWv5FoCbFzLksawpEe' }, // Riders on the Storm — The Doors
-          { num: 4, reponse: 'NEIGE',    spotifyId: '2aibwv5hGXSgw7Yru8IYTO' }, // Snow (Hey Oh) — RHCP
-          { num: 5, reponse: 'VENT',     spotifyId: '2ZQVJD9I6GCqXmkmMuEoLa' }, // Le Vent nous portera — Noir Désir
-          { num: 6, reponse: 'TONNERRE', spotifyId: '57bgtoPSgt236HzfBOd8kj' }, // Thunderstruck — AC/DC
-          { num: 7, reponse: 'SOLEIL',   spotifyId: '05wIrZSwuaVWhcv5FfqeH0' }, // Walking on Sunshine — Katrina and the Waves
+          { num: 1, reponse: 'SOLEIL',   spotifyId: '6dGnYIeXmHdcikdzNNDMm2', titre: 'Here Comes the Sun', artiste: 'The Beatles' },
+          { num: 2, reponse: 'PLUIE',    spotifyId: '1uvyZBs4IZYRebHIB1747m', titre: 'Purple Rain', artiste: 'Prince' },
+          { num: 3, reponse: 'ORAGE',    spotifyId: '14XWXWv5FoCbFzLksawpEe', titre: 'Riders on the Storm', artiste: 'The Doors' },
+          { num: 4, reponse: 'NEIGE',    spotifyId: '2aibwv5hGXSgw7Yru8IYTO', titre: 'Snow (Hey Oh)', artiste: 'Red Hot Chili Peppers' },
+          { num: 5, reponse: 'VENT',     spotifyId: '2ZQVJD9I6GCqXmkmMuEoLa', titre: 'Le Vent nous portera', artiste: 'Noir Désir' },
+          { num: 6, reponse: 'TONNERRE', spotifyId: '57bgtoPSgt236HzfBOd8kj', titre: 'Thunderstruck', artiste: 'AC/DC' },
+          { num: 7, reponse: 'SOLEIL',   spotifyId: '05wIrZSwuaVWhcv5FfqeH0', titre: 'Walking on Sunshine', artiste: 'Katrina and the Waves' },
         ]
       },
       {
         nom: 'Chiffre/Nombre', couleur: '#3982a3',
         morceaux: [
-          { num: 1, reponse: 'SEPT',   spotifyId: '3dPQuX8Gs42Y7b454ybpMR' }, // Seven Nation Army — The White Stripes
-          { num: 2, reponse: '99',     spotifyId: '2IJftBfq7pJ43tfnOR0RB3' }, // 99 Luftballons — Nena
-          { num: 3, reponse: 'UN',     spotifyId: '3G69vJMWsX6ZohTykad2AU' }, // One — U2
-          { num: 4, reponse: 'TROIS',  spotifyId: '3X9XJLwQPWqRnsNaL9z6ss' }, // 3 nuits par semaine — Indochine
-          { num: 5, reponse: 'CINQ',   spotifyId: '6x4tKaOzfNJpEJHySoiJcs' }, // Mambo No. 5 — Lou Bega
-          { num: 6, reponse: 'DEUX',   spotifyId: '3GfOAdcoc3X5GPiiXmpBjK' }, // Song 2 — Blur
+          { num: 1, reponse: 'SEPT',   spotifyId: '3dPQuX8Gs42Y7b454ybpMR', titre: 'Seven Nation Army', artiste: 'The White Stripes' },
+          { num: 2, reponse: '99',     spotifyId: '2IJftBfq7pJ43tfnOR0RB3', titre: '99 Luftballons', artiste: 'Nena' },
+          { num: 3, reponse: 'UN',     spotifyId: '3G69vJMWsX6ZohTykad2AU', titre: 'One', artiste: 'U2' },
+          { num: 4, reponse: 'TROIS',  spotifyId: '3X9XJLwQPWqRnsNaL9z6ss', titre: '3 nuits par semaine', artiste: 'Indochine' },
+          { num: 5, reponse: 'CINQ',   spotifyId: '6x4tKaOzfNJpEJHySoiJcs', titre: 'Mambo No. 5', artiste: 'Lou Bega' },
+          { num: 6, reponse: 'DEUX',   spotifyId: '3GfOAdcoc3X5GPiiXmpBjK', titre: 'Song 2', artiste: 'Blur' },
           { num: 7, reponse: '?',      spotifyId: '' },
         ]
       },
       {
         nom: 'Partie du corps', couleur: '#f39fa3',
         morceaux: [
-          { num: 1, reponse: 'CŒUR',    spotifyId: '4v2rkl1mC3zVAz0nXMx9r4' }, // Heart of Glass — Blondie
-          { num: 2, reponse: 'HANCHES', spotifyId: '3d0WouFnFmr0K3kjeza3fF' }, // Hips Don't Lie — Shakira
-          { num: 3, reponse: 'VISAGE',  spotifyId: '5AVdnvs7tAOp0OJRgSc4wc' }, // Ma Gueule — Johnny Hallyday
-          { num: 4, reponse: 'CŒUR',    spotifyId: '33LC84JgLvK2KuW43MfaNq' }, // My Heart Will Go On — Céline Dion
-          { num: 5, reponse: 'YEUX',    spotifyId: '0pUVeEgZuNyFzIMKp67RbS' }, // Eyes Without a Face — Billy Idol
-          { num: 6, reponse: 'YEUX',    spotifyId: '1fU9wVDi3yZrawv1Rc4vcS' }, // Les Yeux revolver — Marc Lavoine
-          { num: 7, reponse: 'CŒUR',    spotifyId: '0FNFkTfptDRi0AFaulrpOY' }, // Comme des enfants — Cœur de Pirate
+          { num: 1, reponse: 'CŒUR',    spotifyId: '4v2rkl1mC3zVAz0nXMx9r4', titre: 'Heart of Glass', artiste: 'Blondie' },
+          { num: 2, reponse: 'HANCHES', spotifyId: '3d0WouFnFmr0K3kjeza3fF', titre: "Hips Don't Lie", artiste: 'Shakira' },
+          { num: 3, reponse: 'VISAGE',  spotifyId: '5AVdnvs7tAOp0OJRgSc4wc', titre: 'Ma Gueule', artiste: 'Johnny Hallyday' },
+          { num: 4, reponse: 'CŒUR',    spotifyId: '33LC84JgLvK2KuW43MfaNq', titre: 'My Heart Will Go On', artiste: 'Céline Dion' },
+          { num: 5, reponse: 'YEUX',    spotifyId: '0pUVeEgZuNyFzIMKp67RbS', titre: 'Eyes Without a Face', artiste: 'Billy Idol' },
+          { num: 6, reponse: 'YEUX',    spotifyId: '1fU9wVDi3yZrawv1Rc4vcS', titre: 'Les Yeux revolver', artiste: 'Marc Lavoine' },
+          { num: 7, reponse: 'CŒUR',    spotifyId: '0FNFkTfptDRi0AFaulrpOY', titre: 'Comme des enfants', artiste: 'Cœur de Pirate' },
         ]
       },
       { nom: 'Chanteur',    couleur: '#61c3d3', morceaux: slotsVides() },
@@ -483,25 +538,25 @@
       {
         nom: 'Hommes et Femmes 1', couleur: '#f59923',
         morceaux: [
-          { num: 1, reponse: 'LES HOMMES QUI PASSENT',    spotifyId: '4bmMkOEOMTcOLH8V7qk27V' }, // Patricia Kaas
-          { num: 2, reponse: 'FEMME LIKE U',               spotifyId: '6IJmRILFspEP80BmmfAv2m' }, // K.Maro
-          { num: 3, reponse: 'FEMMES... JE VOUS AIME',     spotifyId: '1Cis3BiUs6rLpT3BnRy1TR' }, // Julien Clerc
-          { num: 4, reponse: 'UNE FEMME AMOUREUSE',        spotifyId: '0uNbQRIDBIA8ttt9c0ijki' }, // Mireille Mathieu
-          { num: 5, reponse: 'JE SUIS UN HOMME',           spotifyId: '33X8PxVlOvREs4URnDj9Fw' }, // Zazie
-          { num: 6, reponse: "SI J'ÉTAIS UN HOMME",        spotifyId: '47GJZT1lk4GMARuAdAI4Ct' }, // Diane Tell
-          { num: 7, reponse: 'UNE FEMME AVEC UNE FEMME',   spotifyId: '4XxsxKcIdc16s6FwS6A09A' }, // Mecano
+          { num: 1, reponse: 'LES HOMMES QUI PASSENT',    spotifyId: '4bmMkOEOMTcOLH8V7qk27V', artiste: 'Patricia Kaas' },
+          { num: 2, reponse: 'FEMME LIKE U',               spotifyId: '6IJmRILFspEP80BmmfAv2m', artiste: 'K.Maro' },
+          { num: 3, reponse: 'FEMMES... JE VOUS AIME',     spotifyId: '1Cis3BiUs6rLpT3BnRy1TR', artiste: 'Julien Clerc' },
+          { num: 4, reponse: 'UNE FEMME AMOUREUSE',        spotifyId: '0uNbQRIDBIA8ttt9c0ijki', artiste: 'Mireille Mathieu' },
+          { num: 5, reponse: 'JE SUIS UN HOMME',           spotifyId: '33X8PxVlOvREs4URnDj9Fw', artiste: 'Zazie' },
+          { num: 6, reponse: "SI J'ÉTAIS UN HOMME",        spotifyId: '47GJZT1lk4GMARuAdAI4Ct', artiste: 'Diane Tell' },
+          { num: 7, reponse: 'UNE FEMME AVEC UNE FEMME',   spotifyId: '4XxsxKcIdc16s6FwS6A09A', artiste: 'Mecano' },
         ]
       },
       {
         nom: 'Hommes et Femmes 2', couleur: '#e8375f',
         morceaux: [
-          { num: 1, reponse: 'I\'M EVERY WOMAN',           spotifyId: '2eHj0klWkwRQuIrNlPpCPa' }, // Whitney Houston
-          { num: 2, reponse: 'MAN ON THE MOON',            spotifyId: '4jLv3tDBu8ww2R07DvL12s' }, // R.E.M.
-          { num: 3, reponse: 'THE MAN WHO SOLD THE WORLD', spotifyId: '4mWahKerLaVddUjb8d1Q4Q' }, // David Bowie
-          { num: 4, reponse: 'WOMAN IN CHAINS',            spotifyId: '1ydGjYPl6SkTBwy6yhRCJT' }, // Tears for Fears
+          { num: 1, reponse: 'I\'M EVERY WOMAN',           spotifyId: '2eHj0klWkwRQuIrNlPpCPa', artiste: 'Whitney Houston' },
+          { num: 2, reponse: 'MAN ON THE MOON',            spotifyId: '4jLv3tDBu8ww2R07DvL12s', artiste: 'R.E.M.' },
+          { num: 3, reponse: 'THE MAN WHO SOLD THE WORLD', spotifyId: '4mWahKerLaVddUjb8d1Q4Q', artiste: 'David Bowie' },
+          { num: 4, reponse: 'WOMAN IN CHAINS',            spotifyId: '1ydGjYPl6SkTBwy6yhRCJT', artiste: 'Tears for Fears' },
           { num: 5, reponse: 'FEMME LIBÉRÉE',              spotifyId: '1ofu2qOdm9LN8TGXd003Kj' },
           { num: 6, reponse: 'UN HOMME PRESSÉ',            spotifyId: '637T4loKlXPwfUdQVZjPTV' },
-          { num: 7, reponse: '?',                          spotifyId: '' },
+          { num: 7, reponse: 'UN HOMME EXTRAORDINAIRE',    spotifyId: '6jfHULU1jxpdYPR9gK887U', artiste: 'Les Innocents' },
         ]
       },
       { nom: 'Hommes et Femmes 3', couleur: '#61c3d3', morceaux: slotsVides() },
@@ -526,6 +581,10 @@
     const progressText = document.getElementById('progress-text');
     const btnReponse   = document.getElementById('btn-reponse');
     const reponseText  = document.getElementById('reponse-text');
+    const btnInfos     = document.getElementById('btn-infos');
+    const infosPopup   = document.getElementById('infos-popup');
+    const infosTitre   = document.getElementById('infos-titre');
+    const infosArtiste = document.getElementById('infos-artiste');
     const timerCircle  = document.getElementById('timer-circle');
     const spotifyEmbed = document.getElementById('spotify-embed');
     const playZone     = document.getElementById('play-zone');
@@ -669,9 +728,11 @@
     // ═══ RÉPONSE ═══════════════════════════════════════════════════════════
     function toggleReponse() {
       if (!reponseVisible) {
-        reponseText.textContent = themeActif.morceaux[current].reponse;
+        const m = themeActif.morceaux[current];
+        reponseText.textContent = m.reponse;
         btnReponse.classList.add('revealed');
         reponseVisible = true;
+        btnInfos.classList.toggle('visible', !!m.artiste);
       } else {
         hideReponse();
       }
@@ -680,6 +741,28 @@
     function hideReponse() {
       btnReponse.classList.remove('revealed');
       reponseVisible = false;
+      btnInfos.classList.remove('visible');
+      hideInfos();
+    }
+
+    // ═══ + D'INFOS ═════════════════════════════════════════════════════════
+    let infosVisible = false;
+
+    function toggleInfos() {
+      const m = themeActif.morceaux[current];
+      if (!infosVisible) {
+        infosTitre.textContent = m.titre || m.reponse;
+        infosArtiste.textContent = m.artiste;
+        infosPopup.classList.add('visible');
+        infosVisible = true;
+      } else {
+        hideInfos();
+      }
+    }
+
+    function hideInfos() {
+      infosPopup.classList.remove('visible');
+      infosVisible = false;
     }
 
     // ═══ NAVIGATION ════════════════════════════════════════════════════════
