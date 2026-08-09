@@ -18,8 +18,13 @@ Application web mobile (fichier HTML unique) utilisée pendant un DJ set comme o
 
 ### Thèmes (10)
 
-Créature, Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Chanteur, Réalisateur, Groupe, Film, Série, Pays, Sport, Décennie, Hommes et Femmes 1-4 (17).
-Renseignés : **Créature** (partiel), **Animaux** ✅, **Météo/Saisons** ✅, **Chiffre/Nombre** (6/7), **Partie du corps** ✅, **Hommes et Femmes 1** ✅, **Hommes et Femmes 2** ✅. Les autres ont 7 slots placeholder (`reponse: '?'`, `spotifyId: ''`) à remplir dans le tableau `themes` du JS.
+Créature, Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Chanteur, Réalisateur, Groupe, Film 1, Film 2, Séries 1-4, Pays 1, Pays 2, Sport, Décennie, Hommes et Femmes 1-4 (23).
+
+Certaines catégories (Séries, Pays, Films) ont plus de 7 morceaux fournis → scindées en plusieurs sous-catégories numérotées (comme Hommes et Femmes), pattern à réutiliser si une future liste dépasse 7.
+
+Renseignés : **Créature** (partiel), **Animaux** ✅, **Météo/Saisons** ✅, **Chiffre/Nombre** (6/7), **Partie du corps** ✅, **Hommes et Femmes 1** ✅, **Hommes et Femmes 2** ✅, **Réalisateur** ✅, **Film 1** ✅, **Film 2** (3/7), **Séries 1** (6/7), **Séries 2** ✅, **Séries 3** (5/7), **Séries 4** (3/7), **Pays 1** ✅, **Pays 2** (4/7), **Sport** (4/7). Les autres (Chanteur, Groupe, Décennie) ont 7 slots placeholder à remplir.
+
+⚠️ **Séries 1 #7 "SIX FEET UNDER"** : `spotifyId` vide — l'ID fourni par l'utilisateur (`2eHj0klWkwRQuIrNlPpCPa`) était une collision avec un autre morceau déjà utilisé (I'm Every Woman). ID correct à redemander.
 
 ### Bouton "+ d'infos"
 
