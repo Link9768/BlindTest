@@ -704,7 +704,19 @@
     const infosTitre   = document.getElementById('infos-titre');
     const infosArtiste = document.getElementById('infos-artiste');
     const timerCircle  = document.getElementById('timer-circle');
-    const spotifyEmbed = document.getElementById('spotify-embed');
+    let spotifyEmbed = document.getElementById('spotify-embed');
+
+    // Remplace entièrement le nœud iframe (au lieu de juste changer .src) : garantit
+    // un rechargement propre à chaque fois, même quand deux assignations .src successives
+    // seraient fusionnées par le navigateur. Applique à TOUS les thèmes (fonction partagée).
+    function reloadSpotifyEmbed(src) {
+      const fresh = document.createElement('iframe');
+      fresh.id = 'spotify-embed';
+      fresh.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture');
+      fresh.src = src;
+      spotifyEmbed.replaceWith(fresh);
+      spotifyEmbed = fresh;
+    }
     const playZone     = document.getElementById('play-zone');
 
     // ═══ MENU ══════════════════════════════════════════════════════════════
@@ -728,7 +740,7 @@
 
     function showMenu() {
       stopPlay();
-      spotifyEmbed.src = '';
+      reloadSpotifyEmbed('');
       screenPlayer.classList.remove('visible');
       screenMenu.classList.add('visible');
     }
@@ -764,12 +776,12 @@
 
       if (m.spotifyId) {
         playZone.classList.remove('empty');
-        // reset forcé : même morceau revisité doit repartir du début, pas rester sur son ancienne position
-        spotifyEmbed.src = '';
-        spotifyEmbed.src = `https://open.spotify.com/embed/track/${m.spotifyId}?utm_source=generator&theme=0`;
+        // nœud iframe recréé à chaque fois : garantit que le morceau reparte du début,
+        // même en revisitant le même morceau ou le même thème
+        reloadSpotifyEmbed(`https://open.spotify.com/embed/track/${m.spotifyId}?utm_source=generator&theme=0`);
       } else {
         playZone.classList.add('empty');
-        spotifyEmbed.src = '';
+        reloadSpotifyEmbed('');
       }
 
       resetTimer();
