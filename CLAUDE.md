@@ -16,15 +16,23 @@ Application web mobile (fichier HTML unique) utilisée pendant un DJ set comme o
 1. **Menu** (`#screen-menu`) : grille de 10 tuiles thèmes + bouton "Connexion Spotify" (ouvre `accounts.spotify.com/login` — une fois connecté dans le navigateur, les embeds jouent les morceaux complets depuis le début, pour toute la session)
 2. **Player** (`#screen-player`) : carrousel disques vinyle superposés, bandeau "Voir la réponse" pleine largeur, bouton play central avec anneau timer vert, bouton "← Menu", "Suivant →"
 
-### Thèmes (10)
+### Thèmes (34)
 
-Créature, Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Chanteur, Réalisateur, Groupe, Film 1, Film 2, Séries 1-4, Pays 1, Pays 2, Sport, Décennie, Hommes et Femmes 1-4 (23).
+Créature, Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Chanteur, Réalisateur, Groupe 1-3, Film 1-2, Séries 1-4, Pays 1-2, Sport, Décennie, Hommes et Femmes 1-4, Couleur, Vêtement, Nom de famille, À ne pas faire 1-2, Il faut, Lieux 1-2, Jours.
 
-Certaines catégories (Séries, Pays, Films) ont plus de 7 morceaux fournis → scindées en plusieurs sous-catégories numérotées (comme Hommes et Femmes), pattern à réutiliser si une future liste dépasse 7.
+Toute catégorie dont la liste fournie dépasse 7 morceaux → scindée en sous-catégories numérotées (Séries, Pays, Film, Groupe, Hommes et Femmes, À ne pas faire, Lieux). Pattern à réutiliser systématiquement.
 
-Renseignés : **Créature** (partiel), **Animaux** ✅, **Météo/Saisons** ✅, **Chiffre/Nombre** (6/7), **Partie du corps** ✅, **Hommes et Femmes 1** ✅, **Hommes et Femmes 2** ✅, **Réalisateur** ✅, **Film 1** ✅, **Film 2** (3/7), **Séries 1** (6/7), **Séries 2** ✅, **Séries 3** (5/7), **Séries 4** (3/7), **Pays 1** ✅, **Pays 2** (4/7), **Sport** (4/7). Les autres (Chanteur, Groupe, Décennie) ont 7 slots placeholder à remplir.
+Renseignés complets ✅ : Animaux, Météo/Saisons, Partie du corps, Hommes et Femmes 1-2, Réalisateur, Film 1, Séries 2, Pays 1, Groupe 1-3, Lieux 1.
+Partiels : Créature (2/7), Chiffre/Nombre (6/7), Film 2 (6/7), Séries 1 (6/7), Séries 3 (5/7), Séries 4 (3/7), Pays 2 (4/7), Sport (6/7), Hommes et Femmes 3 (6/7), Hommes et Femmes 4 (5/7), Couleur (6/7), Vêtement (2 confirmés + 1 flag), Nom de famille (6/7, réponses déduites), À ne pas faire 1 (6/7 + 1 flag), À ne pas faire 2 (2/7), Il faut (2/7, réponses déduites), Lieux 2 (3/7), Jours (3/7).
+Vides : Chanteur, Décennie.
 
-⚠️ **Séries 1 #7 "SIX FEET UNDER"** : `spotifyId` vide — l'ID fourni par l'utilisateur (`2eHj0klWkwRQuIrNlPpCPa`) était une collision avec un autre morceau déjà utilisé (I'm Every Woman). ID correct à redemander.
+⚠️ **Points à vérifier avec l'utilisateur** :
+- **Séries 1 #7 "SIX FEET UNDER"** : `spotifyId` vide — l'ID fourni (`2eHj0klWkwRQuIrNlPpCPa`) était une collision avec I'm Every Woman.
+- **Vêtement #2 "Laisse béton" (Renaud)** : aucune réponse fournie ni déductible du titre (pas de référence vêtement identifiée) — `reponse: '?'`.
+- **À ne pas faire 1 #4 "Don't Look Back in Anger" (Oasis)** : réponse non fournie — `reponse: '?'`.
+- **Nom de famille** et **Il faut** : réponses déduites du titre de la chanson (pas explicitement données par l'utilisateur), à faire valider.
+- **Bob Marley — No Woman No Cry, réponse "pieds"** : non intégré. Réponse incohérente avec la chanson (aucune référence aux pieds) et ne correspond à aucun thème existant (Partie du corps est déjà plein 7/7). À clarifier avant intégration.
+- **Réserves non intégrées** (mentionnées explicitement "pour usage futur") : Groupe 4 (Louise Attaque, Journey, Trust, Bon Jovi, Metallica), Hommes et Femmes 5 (Neil Young, Lynyrd Skynyrd — Old Man / Simple Man).
 
 ### Bouton "+ d'infos"
 
