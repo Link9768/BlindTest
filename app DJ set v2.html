@@ -26,12 +26,14 @@
       color: #fff;
       font-family: 'Arial Rounded MT Bold', 'Nunito', 'Arial', sans-serif;
       height: 100vh;
+      height: 100dvh; /* 100vh suppose la barre d'adresse déjà masquée : tant qu'elle est visible, le bas de la page dépasse l'écran (bouton play poussé hors champ). dvh s'adapte dynamiquement. */
       overflow: hidden;
       user-select: none;
     }
 
     .screen {
       height: 100vh;
+      height: 100dvh;
       display: none;
       flex-direction: column;
       align-items: center;
