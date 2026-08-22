@@ -31,6 +31,9 @@ Vides : Chanteur, Décennie.
 - ~~Film 2 #5/#6~~ corrigé : réponses = titre du film (JURASSIC PARK, LE GRAND BLEU), pas le concept.
 - **Ville** (nouveau thème, complet ✅) : réponses déduites du titre sauf "New York" (donnée). Kansas et Tennessee sont des états, pas des villes, à valider si voulu tel quel.
 - **Jours de la semaine** (renommé depuis "Jours", complet ✅) : 7/7.
+- **Biopic 1-3** (nouveau, 20 morceaux répartis 7/7/6) : réponse = titre du film biopic.
+  - ⚠️ Biopic 1 #5 (Rocketman / Sacrifice — Elton John) : ID fourni trop court (20 caractères au lieu de 22), laissé vide, à redonner.
+  - Biopic 3 #3 (8 Mile) et #4 (La Môme) : mêmes chansons déjà présentes ailleurs (Film 1, À ne pas faire 1) mais avec un ID Spotify différent de celui donné ici — intégré tel quel, à vérifier si voulu.
 - **Vêtement #2 "Laisse béton" (Renaud)** : aucune réponse fournie ni déductible du titre (pas de référence vêtement identifiée) — `reponse: '?'`.
 - **À ne pas faire 1 #4 "Don't Look Back in Anger" (Oasis)** : réponse non fournie — `reponse: '?'`.
 - **Nom de famille** et **Il faut** : réponses déduites du titre de la chanson (pas explicitement données par l'utilisateur), à faire valider.
