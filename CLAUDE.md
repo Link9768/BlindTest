@@ -29,6 +29,8 @@ Vides : Chanteur, Décennie.
 ⚠️ **Points à vérifier avec l'utilisateur** :
 - **Séries 1 #7 "SIX FEET UNDER"** : `spotifyId` vide — l'ID fourni (`2eHj0klWkwRQuIrNlPpCPa`) était une collision avec I'm Every Woman.
 - ~~Film 2 #5/#6~~ corrigé : réponses = titre du film (JURASSIC PARK, LE GRAND BLEU), pas le concept.
+- **Ville** (nouveau thème, complet ✅) : réponses déduites du titre sauf "New York" (donnée). Kansas et Tennessee sont des états, pas des villes, à valider si voulu tel quel.
+- **Jours de la semaine** (renommé depuis "Jours", complet ✅) : 7/7.
 - **Vêtement #2 "Laisse béton" (Renaud)** : aucune réponse fournie ni déductible du titre (pas de référence vêtement identifiée) — `reponse: '?'`.
 - **À ne pas faire 1 #4 "Don't Look Back in Anger" (Oasis)** : réponse non fournie — `reponse: '?'`.
 - **Nom de famille** et **Il faut** : réponses déduites du titre de la chanson (pas explicitement données par l'utilisateur), à faire valider.
