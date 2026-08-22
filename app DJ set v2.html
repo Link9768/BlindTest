@@ -26,14 +26,12 @@
       color: #fff;
       font-family: 'Arial Rounded MT Bold', 'Nunito', 'Arial', sans-serif;
       height: 100vh;
-      height: 100dvh; /* 100vh suppose la barre d'adresse déjà masquée : tant qu'elle est visible, le bas de la page dépasse l'écran (bouton play poussé hors champ). dvh s'adapte dynamiquement. */
       overflow: hidden;
       user-select: none;
     }
 
     .screen {
       height: 100vh;
-      height: 100dvh;
       display: none;
       flex-direction: column;
       align-items: center;
@@ -120,12 +118,6 @@
       gap: 10px;
     }
     #btn-spotify-login:hover { filter: brightness(1.1); }
-    #spotify-login-hint {
-      font-size: 0.8rem;
-      opacity: 0.6;
-      text-align: center;
-      max-width: 260px;
-    }
 
     /* ═══════════ ÉCRAN PLAYER ═══════════ */
 
@@ -266,15 +258,12 @@
       margin-bottom: 26px;
     }
 
-    /* Fenêtre qui ne laisse voir que le bouton play du widget Spotify.
-       Volontairement plus large + zoom plus faible que l'ancien calage serré :
-       le bouton change d'icône selon l'état (play/pause/chargement/logo),
-       une fenêtre trop étroite perdait l'icône dès que l'état changeait. */
+    /* Fenêtre qui ne laisse voir que le bouton play du widget Spotify */
     #spotify-window {
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 90px; height: 90px;
+      width: 64px; height: 64px;
       border-radius: 50%;
       overflow: hidden;
       background: #fff;
@@ -290,9 +279,8 @@
       width: 300px;
       height: 80px;
       border: none;
-      /* zoom réduit (1.15 au lieu de 1.5) : laisse une marge autour du bouton
-         pour que l'icône reste visible même quand elle change de forme (pause/logo) */
-      transform: scale(1.15);
+      /* zoom sur le bouton play pour masquer les éléments voisins du widget */
+      transform: scale(1.5);
       transform-origin: calc(100% - 28px) 46px;
     }
 
@@ -426,10 +414,9 @@
   <div id="screen-menu" class="screen visible">
     <h1>DJ Set</h1>
     <div id="themes-grid"><!-- généré par JS --></div>
-    <button id="btn-spotify-login" onclick="location.href='https://accounts.spotify.com/login'">
+    <button id="btn-spotify-login" onclick="window.open('https://accounts.spotify.com/login', '_blank')">
       <span>●</span> Connexion Spotify
     </button>
-    <p id="spotify-login-hint">Une fois connecté, reviens ici avec le bouton ← retour du navigateur</p>
   </div>
 
   <!-- ═══════════ ÉCRAN PLAYER ═══════════ -->
