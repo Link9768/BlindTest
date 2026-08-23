@@ -91,7 +91,22 @@ CŒUR (Heart of Glass), HANCHES (Hips Don't Lie), VISAGE (Ma Gueule), CŒUR (My 
 - Sync play/pause via `postMessage` (`playback_update`)
 - Morceau sans `spotifyId` → icône 🚫 à la place du play
 
-### Lecture depuis le début
+### Lecture — deux moteurs (2026-08-23)
+
+Le code contient **deux moteurs de lecture**, choisis automatiquement via le flag `useSdk` :
+
+1. **Web Playback SDK** (`sdk.scdn.co/spotify-player.js`) — actif si l'utilisateur est connecté ET Premium. Morceaux **complets**, y compris sur mobile. Pas d'iframe → pas de latence de rechargement, pas de blocage autoplay. Lecture démarrée via `PUT /me/player/play` (`uris`, `position_ms: 0`, `device_id`), contrôle ensuite via `sdkPlayer.togglePlay()`.
+2. **IFrame embed** (fallback) — extraits 30s, comportement historique. Utilisé si non connecté, pas Premium (`account_error`), ou SDK indisponible.
+
+**OAuth PKCE** (pas de backend, pas de Client Secret — il serait public sur GitHub Pages) :
+- `SPOTIFY_CLIENT_ID` en clair dans le fichier (normal, c'est une donnée publique)
+- Redirect URI = `location.origin + location.pathname` → doit correspondre **exactement** à celle déclarée sur developer.spotify.com (d'où le renommage en `index.html`)
+- Token + refresh_token en localStorage, refresh automatique 60s avant expiration
+- Au retour OAuth, `?code=...` est retiré de l'URL via `history.replaceState`
+
+⚠️ **Mode Development = 5 comptes Spotify max.** Pour qu'un ami puisse lancer la musique depuis son téléphone, ajouter son email dans le dashboard Spotify (User Management).
+
+### Lecture depuis le début (ancien comportement, fallback iframe)
 
 L'embed sans connexion joue un extrait 30s choisi par Spotify (souvent le refrain). Connecté à un compte Premium dans le même navigateur → morceau complet depuis le début. Aucun paramètre d'URL ne force ça.
 

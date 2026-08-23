@@ -118,6 +118,8 @@
       gap: 10px;
     }
     #btn-spotify-login:hover { filter: brightness(1.1); }
+    /* Connecté : le bouton devient un simple indicateur, plus un bouton d'action */
+    #btn-spotify-login:disabled { cursor: default; opacity: 0.85; }
 
     /* ═══════════ ÉCRAN PLAYER ═══════════ */
 
@@ -421,9 +423,7 @@
   <div id="screen-menu" class="screen visible">
     <h1>DJ Set</h1>
     <div id="themes-grid"><!-- généré par JS --></div>
-    <button id="btn-spotify-login" onclick="window.open('https://accounts.spotify.com/login', '_blank')">
-      <span>●</span> Connexion Spotify
-    </button>
+    <button id="btn-spotify-login" onclick="spotifyLogin()">● Connexion Spotify</button>
   </div>
 
   <!-- ═══════════ ÉCRAN PLAYER ═══════════ -->
@@ -891,7 +891,7 @@
         nom: 'Biopic 4', couleur: '#3982a3',
         morceaux: [
           { num: 1, reponse: 'LOVE & MERCY', spotifyId: '0ObrXLrfrqJUNc8RfmIBHP', titre: 'God Only Knows', artiste: 'The Beach Boys' },
-          { num: 2, reponse: 'WALK THE LINE', spotifyId: '28cnXtME493VX9NOw9cIUh', titre: 'Hurt', artiste: 'Johnny Cash' },
+          { num: 2, reponse: '?', spotifyId: '' },
           { num: 3, reponse: '?', spotifyId: '' },
           { num: 4, reponse: '?', spotifyId: '' },
           { num: 5, reponse: '?', spotifyId: '' },
@@ -927,10 +927,136 @@
     const playZone     = document.getElementById('play-zone');
     const btnPlay      = document.getElementById('btn-play');
 
-    // ═══ SPOTIFY (SDK IFrame API, iframe masquée) ══════════════════════════
-    // L'iframe Spotify est cachée : son bouton natif changeait de position selon
-    // l'état, ce qui rendait le contrôle impossible. On pilote via le SDK et on
-    // affiche notre propre bouton, toujours au même endroit, avec 2 états.
+    // ═══════════════════════════════════════════════════════════════════════
+    // LECTURE — deux moteurs, choisis automatiquement :
+    //   1. Web Playback SDK (si connecté + Premium) : morceaux COMPLETS, pas
+    //      d'iframe, donc pas de latence de rechargement ni de blocage autoplay.
+    //   2. IFrame embed (fallback) : extraits 30s, comportement historique.
+    //      Utilisé si non connecté, pas Premium, ou SDK indisponible.
+    // ═══════════════════════════════════════════════════════════════════════
+    const SPOTIFY_CLIENT_ID = 'f6fe565d7cfc4eb5878edd275891b46b';
+    const REDIRECT_URI = location.origin + location.pathname;
+    const SCOPES = 'streaming user-read-email user-read-private user-modify-playback-state';
+
+    let useSdk = false;          // true = Web Playback SDK actif
+    let sdkPlayer = null;
+    let sdkDeviceId = null;
+    let currentUri = null;
+
+    // ─── OAuth PKCE ────────────────────────────────────────────────────────
+    function randomString(len) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      return Array.from(crypto.getRandomValues(new Uint8Array(len)))
+        .reduce((acc, x) => acc + chars[x % chars.length], '');
+    }
+
+    function base64url(buf) {
+      return btoa(String.fromCharCode(...new Uint8Array(buf)))
+        .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    }
+
+    async function spotifyLogin() {
+      const verifier = randomString(64);
+      localStorage.setItem('sp_verifier', verifier);
+      const hashed = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+      const url = new URL('https://accounts.spotify.com/authorize');
+      url.search = new URLSearchParams({
+        response_type: 'code',
+        client_id: SPOTIFY_CLIENT_ID,
+        scope: SCOPES,
+        code_challenge_method: 'S256',
+        code_challenge: base64url(hashed),
+        redirect_uri: REDIRECT_URI,
+      }).toString();
+      location.href = url.toString();
+    }
+
+    async function exchangeCode(code) {
+      const res = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: SPOTIFY_CLIENT_ID,
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: REDIRECT_URI,
+          code_verifier: localStorage.getItem('sp_verifier') || '',
+        }),
+      });
+      if (!res.ok) return null;
+      return storeToken(await res.json());
+    }
+
+    async function refreshToken() {
+      const rt = localStorage.getItem('sp_refresh');
+      if (!rt) return null;
+      const res = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: SPOTIFY_CLIENT_ID,
+          grant_type: 'refresh_token',
+          refresh_token: rt,
+        }),
+      });
+      if (!res.ok) return null;
+      return storeToken(await res.json());
+    }
+
+    function storeToken(data) {
+      if (!data.access_token) return null;
+      localStorage.setItem('sp_token', data.access_token);
+      localStorage.setItem('sp_expires', Date.now() + (data.expires_in - 60) * 1000);
+      if (data.refresh_token) localStorage.setItem('sp_refresh', data.refresh_token);
+      return data.access_token;
+    }
+
+    // Renvoie un token valide, rafraîchi si nécessaire ; null si non connecté
+    async function getToken() {
+      const token = localStorage.getItem('sp_token');
+      const exp = Number(localStorage.getItem('sp_expires') || 0);
+      if (token && Date.now() < exp) return token;
+      return refreshToken();
+    }
+
+    // ─── Web Playback SDK ──────────────────────────────────────────────────
+    window.onSpotifyWebPlaybackSDKReady = async () => {
+      const token = await getToken();
+      if (!token) return; // pas connecté → on reste sur le fallback iframe
+
+      sdkPlayer = new Spotify.Player({
+        name: 'DJ Set',
+        getOAuthToken: async (cb) => { const t = await getToken(); if (t) cb(t); },
+        volume: 0.8,
+      });
+
+      sdkPlayer.addListener('ready', ({ device_id }) => {
+        sdkDeviceId = device_id;
+        useSdk = true;
+        updateLoginUi();
+        if (currentUri) btnPlay.disabled = false;
+      });
+
+      // Premium requis : sans ça le SDK refuse de démarrer → on garde l'iframe
+      sdkPlayer.addListener('account_error', () => { useSdk = false; updateLoginUi(); });
+      sdkPlayer.addListener('initialization_error', () => { useSdk = false; });
+      sdkPlayer.addListener('authentication_error', () => {
+        localStorage.removeItem('sp_token');
+        useSdk = false;
+        updateLoginUi();
+      });
+
+      sdkPlayer.addListener('player_state_changed', (state) => {
+        if (!state) return;
+        btnPlay.classList.toggle('playing', !state.paused);
+        if (!state.paused && !isPlaying) startPlay();
+        if (state.paused && isPlaying) pauseTimer();
+      });
+
+      sdkPlayer.connect();
+    };
+
+    // ─── Fallback : IFrame embed (extraits 30s) ────────────────────────────
     let embedController = null;
     let embedReady = false;
     let pendingUri = null;
@@ -943,42 +1069,78 @@
           embedController = controller;
           embedReady = true;
           controller.addListener('playback_update', (e) => {
+            if (useSdk) return; // le SDK pilote, on ignore l'iframe
             const paused = e.data.isPaused;
             btnPlay.classList.toggle('playing', !paused);
             if (!paused && !isPlaying) startPlay();
             if (paused && isPlaying) pauseTimer();
           });
-          // "ready" se redéclenche à chaque loadUri() : autoPlayOnReady indique si
-          // ce prochain "ready" doit relancer la lecture (cas "Suivant" pendant que
-          // ça jouait déjà). removeListener n'existe pas sur cette API, d'où le flag.
-          controller.addListener('ready', () => {
-            if (autoPlayOnReady) { autoPlayOnReady = false; controller.play(); }
-          });
-          if (pendingUri !== null) { loadTrack(pendingUri); pendingUri = null; }
+          if (pendingUri) { loadTrack(pendingUri); pendingUri = null; }
         }
       );
     };
 
-    let autoPlayOnReady = false;
-
+    // ─── API commune (le reste du code ne sait pas quel moteur tourne) ─────
     function loadTrack(uri) {
-      if (!embedReady) { pendingUri = uri; return; }
-      autoPlayOnReady = isPlaying;
-      // startAt: 0 dès le chargement — remplace l'ancien seek(0) après délai deviné
-      // (plus fiable : plus besoin d'attendre un timing arbitraire pour repartir à 0)
-      embedController.loadUri(uri, false, 0);
-      btnPlay.disabled = false;
+      const changed = uri !== currentUri;
+      currentUri = uri;
       btnPlay.classList.remove('playing');
+
+      if (useSdk) {
+        // Coupe le morceau précédent, sinon il continue pendant qu'on en choisit un autre
+        if (changed && sdkPlayer) sdkPlayer.pause();
+        btnPlay.disabled = false;
+        return; // le morceau sera lancé au clic play (position_ms: 0)
+      }
+      if (!embedReady) { pendingUri = uri; return; }
+      embedController.loadUri(uri);
+      setTimeout(() => embedController.seek(0), 300);
+      btnPlay.disabled = false;
     }
 
-    function togglePlay() {
+    async function togglePlay() {
+      if (useSdk) {
+        const state = await sdkPlayer.getCurrentState();
+        // Rien en cours (ou autre morceau) → on démarre celui-ci depuis le début
+        if (!state || state.track_window?.current_track?.uri !== currentUri) {
+          const token = await getToken();
+          await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${sdkDeviceId}`, {
+            method: 'PUT',
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uris: [currentUri], position_ms: 0 }),
+          });
+        } else {
+          await sdkPlayer.togglePlay();
+        }
+        return;
+      }
       if (embedReady) embedController.togglePlay();
     }
 
     function stopTrack() {
-      if (embedReady) embedController.pause();
+      if (useSdk && sdkPlayer) sdkPlayer.pause();
+      else if (embedReady) embedController.pause();
       btnPlay.classList.remove('playing');
     }
+
+    function updateLoginUi() {
+      const btn = document.getElementById('btn-spotify-login');
+      if (!btn) return;
+      btn.textContent = useSdk ? '✓ Spotify connecté — morceaux complets' : '● Connexion Spotify';
+      btn.disabled = useSdk;
+    }
+
+    // Au chargement : récupère le code OAuth s'il y en a un dans l'URL
+    (async () => {
+      const params = new URLSearchParams(location.search);
+      const code = params.get('code');
+      if (code) {
+        await exchangeCode(code);
+        // Nettoie l'URL (retire ?code=...) sans recharger la page
+        history.replaceState({}, '', REDIRECT_URI);
+      }
+      updateLoginUi();
+    })();
 
     // ═══ MENU ══════════════════════════════════════════════════════════════
     themes.forEach((t, i) => {
@@ -1150,9 +1312,10 @@
       }
     }
   </script>
-  <!-- Chargé APRÈS le script principal : window.onSpotifyIframeApiReady doit
-       exister avant que le SDK (async) ne s'exécute et l'appelle. -->
+  <!-- Chargés APRÈS le script principal : les callbacks onSpotify*Ready doivent
+       exister avant que ces scripts (async) ne s'exécutent et les appellent. -->
   <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+  <script src="https://sdk.scdn.co/spotify-player.js" async></script>
 
 </body>
 </html>
