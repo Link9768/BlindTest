@@ -28,7 +28,15 @@ Vides : Chanteur, Décennie.
 
 ⚠️ **Points à vérifier avec l'utilisateur** :
 - ~~Biopic 1 #5 Rocketman~~ corrigé, ID complet fourni.
-- **Biopic 4** (nouveau, 1/7 seulement — Love & Mercy/Beach Boys). Biopics réels identifiés en réserve pour compléter (IDs Spotify à fournir) : Walk the Line (Johnny Cash), Straight Outta Compton (N.W.A), Selena (Selena Quintanilla), Rocketman... déjà utilisé.
+- **Biopic 4** (2/7 — Love & Mercy/Beach Boys, Walk the Line/Johnny Cash). Biopics réels identifiés en réserve pour compléter (IDs Spotify à fournir) : Straight Outta Compton (N.W.A), Selena (Selena Quintanilla), Maria Callas (2025).
+
+### Lecture complète vs extrait 30s — confirmé par test (2026-08-23)
+
+Le SDK officiel IFrame API débloque la lecture complète (2min30+ testé, sans connexion Spotify) **sur PC**, mais pas sur mobile — comportement lié au navigateur (cookies tiers bloqués sur mobile), pas à une session locale : le SDK est chargé depuis le CDN public Spotify, identique pour tout visiteur. Confirmé factuellement : aucun OAuth n'est branché dans le code à ce stade (Client ID récupéré par l'utilisateur mais jamais intégré).
+
+### Fix latence + bug silence sur "Suivant" (2026-08-23)
+
+`loadUri(uri, preferVideo, startAt)` accepte un `startAt` — remplace l'ancien `seek(0)` après délai arbitraire de 300ms (source de bug : le widget tentait parfois de reprendre la lecture avant que le seek n'ait eu lieu, donnant un état "en lecture" sans son). Pour l'enchaînement auto quand on clique "Suivant" pendant qu'un morceau joue : écoute l'event `ready` (déclenché à chaque `loadUri`) plutôt qu'un timing deviné. `removeListener` n'existe pas sur l'API — utiliser un flag (`autoPlayOnReady`) plutôt que désabonner l'event.
 - **Séries 1 #7 "SIX FEET UNDER"** : `spotifyId` vide — l'ID fourni (`2eHj0klWkwRQuIrNlPpCPa`) était une collision avec I'm Every Woman.
 - **Vêtement #2 "Laisse béton" (Renaud)** : aucune réponse fournie ni déductible du titre (pas de référence vêtement identifiée) — `reponse: '?'`.
 - **À ne pas faire 1 #4 "Don't Look Back in Anger" (Oasis)** : réponse non fournie — `reponse: '?'`.

@@ -948,17 +948,25 @@
             if (!paused && !isPlaying) startPlay();
             if (paused && isPlaying) pauseTimer();
           });
-          if (pendingUri) { loadTrack(pendingUri); pendingUri = null; }
+          // "ready" se redéclenche à chaque loadUri() : autoPlayOnReady indique si
+          // ce prochain "ready" doit relancer la lecture (cas "Suivant" pendant que
+          // ça jouait déjà). removeListener n'existe pas sur cette API, d'où le flag.
+          controller.addListener('ready', () => {
+            if (autoPlayOnReady) { autoPlayOnReady = false; controller.play(); }
+          });
+          if (pendingUri !== null) { loadTrack(pendingUri); pendingUri = null; }
         }
       );
     };
 
+    let autoPlayOnReady = false;
+
     function loadTrack(uri) {
       if (!embedReady) { pendingUri = uri; return; }
-      embedController.loadUri(uri);
-      // seek(0) après le chargement : force le redémarrage au début même si Spotify
-      // tente de reprendre à la dernière position écoutée (compte connecté)
-      setTimeout(() => embedController.seek(0), 300);
+      autoPlayOnReady = isPlaying;
+      // startAt: 0 dès le chargement — remplace l'ancien seek(0) après délai deviné
+      // (plus fiable : plus besoin d'attendre un timing arbitraire pour repartir à 0)
+      embedController.loadUri(uri, false, 0);
       btnPlay.disabled = false;
       btnPlay.classList.remove('playing');
     }
