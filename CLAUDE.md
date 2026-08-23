@@ -28,12 +28,6 @@ Vides : Chanteur, Décennie.
 
 ⚠️ **Points à vérifier avec l'utilisateur** :
 - **Séries 1 #7 "SIX FEET UNDER"** : `spotifyId` vide — l'ID fourni (`2eHj0klWkwRQuIrNlPpCPa`) était une collision avec I'm Every Woman.
-- ~~Film 2 #5/#6~~ corrigé : réponses = titre du film (JURASSIC PARK, LE GRAND BLEU), pas le concept.
-- **Ville** (nouveau thème, complet ✅) : réponses déduites du titre sauf "New York" (donnée). Kansas et Tennessee sont des états, pas des villes, à valider si voulu tel quel.
-- **Jours de la semaine** (renommé depuis "Jours", complet ✅) : 7/7.
-- **Biopic 1-3** (nouveau, 20 morceaux répartis 7/7/6) : réponse = titre du film biopic.
-  - ⚠️ Biopic 1 #5 (Rocketman / Sacrifice — Elton John) : ID fourni trop court (20 caractères au lieu de 22), laissé vide, à redonner.
-  - Biopic 3 #3 (8 Mile) et #4 (La Môme) : mêmes chansons déjà présentes ailleurs (Film 1, À ne pas faire 1) mais avec un ID Spotify différent de celui donné ici — intégré tel quel, à vérifier si voulu.
 - **Vêtement #2 "Laisse béton" (Renaud)** : aucune réponse fournie ni déductible du titre (pas de référence vêtement identifiée) — `reponse: '?'`.
 - **À ne pas faire 1 #4 "Don't Look Back in Anger" (Oasis)** : réponse non fournie — `reponse: '?'`.
 - **Nom de famille** et **Il faut** : réponses déduites du titre de la chanson (pas explicitement données par l'utilisateur), à faire valider.
@@ -83,18 +77,13 @@ CŒUR (Heart of Glass), HANCHES (Hips Don't Lie), VISAGE (Ma Gueule), CŒUR (My 
 
 ### Widget Spotify
 
-- iframe brute (`open.spotify.com/embed/track/{id}?utm_source=generator&theme=0`) dans `#spotify-window` (fenêtre circulaire 64px, `overflow: hidden`) calée pour ne montrer que le bouton play du widget — `transform: scale(1.5)` + `transform-origin: calc(100% - 28px) 46px`
-- Nœud iframe recréé à chaque changement de morceau (`reloadSpotifyEmbed`) plutôt que juste changer `.src` : garantit un rechargement propre
+- iframe embed dans `#spotify-window` (fenêtre circulaire 64px, `overflow: hidden`) calée pour ne montrer que le bouton play du widget
 - Sync play/pause via `postMessage` (`playback_update`)
 - Morceau sans `spotifyId` → icône 🚫 à la place du play
 
-⚠️ **Tentative abandonnée (2026-08) : SDK officiel Spotify IFrame API.** Remplacé l'iframe brute par `IFrameAPI.createController()` + `seek(0)` forcé pour régler le bug "reprend à la dernière position écoutée au lieu de redémarrer" (repro : Créature #1 Zombie/Cranberries, compte connecté). Techniquement ça aurait dû corriger le bug, mais **casse l'affichage** : le bouton play redevient invisible/mal calé (cause exacte non identifiée — possiblement le SDK génère une structure DOM différente que la fenêtre de recadrage CSS ne cible plus correctement). **Rollback fait, ne pas retenter sans vérification visuelle réelle (screenshot) à chaque étape.** Le bug "reprend où on s'était arrêté" reste non résolu, mais secondaire vu qu'il ne se produit que si la connexion Spotify passe (rare sur mobile, cf. note ci-dessous).
-
 ### Lecture depuis le début
 
-L'embed sans connexion joue un extrait 30s choisi par Spotify (souvent le refrain). Connecté à un compte Premium dans le même navigateur → en théorie morceau complet depuis le début, mais peut aussi reprendre à la dernière position écoutée plutôt que redémarrer (bug non résolu, cf. ci-dessus). Aucun paramètre d'URL simple ne force la position à 0 sur l'iframe brute.
-
-⚠️ **Connexion Spotify sur mobile (Samsung Internet/Chrome)** : la session `accounts.spotify.com` ne se propage généralement pas à l'iframe `open.spotify.com` (cookies tiers bloqués par défaut) → limite structurelle. Décision utilisateur (2026-08) : rester sur extraits 30s, ne pas retenter de fix sans repartir d'un vrai besoin validé.
+L'embed sans connexion joue un extrait 30s choisi par Spotify (souvent le refrain). Connecté à un compte Premium dans le même navigateur → morceau complet depuis le début. Aucun paramètre d'URL ne force ça.
 
 ## Ce qui reste à faire
 

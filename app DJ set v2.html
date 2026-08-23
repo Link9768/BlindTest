@@ -598,8 +598,8 @@
           { num: 2, reponse: 'LES CHORISTES',    spotifyId: '1SG8aXWAw1w4DuteC7MDjK', titre: 'Vois sur ton chemin', artiste: 'Bruno Coulais' },
           { num: 3, reponse: 'JAMES BOND',       spotifyId: '5NJ9uJLXIy5bLOrC4Y8Gaw', titre: 'Live and Let Die', artiste: 'Wings' },
           { num: 4, reponse: 'LA PETITE SIRÈNE', spotifyId: '7H3vN4DmP9DogJvwxA9oRp', titre: "Sous l'océan", artiste: 'Henri Salvador' },
-          { num: 5, reponse: 'JURASSIC PARK',    spotifyId: '0VToSd6yOyIpLgTZkq3iuT', titre: 'Theme From Jurassic Park', artiste: 'John Williams' },
-          { num: 6, reponse: 'LE GRAND BLEU',    spotifyId: '3A5l6QS6oJEWrL9sSN3l2c', titre: 'The Big Blue', artiste: 'Éric Serra' },
+          { num: 5, reponse: 'DINOSAURE',        spotifyId: '0VToSd6yOyIpLgTZkq3iuT', titre: 'Theme From Jurassic Park', artiste: 'John Williams' }, // réponse donnée par l'utilisateur (mode D), pas le titre du film
+          { num: 6, reponse: 'PLONGÉE',          spotifyId: '3A5l6QS6oJEWrL9sSN3l2c', titre: 'The Big Blue', artiste: 'Éric Serra' }, // idem, réponse concept et non titre du film
           { num: 7, reponse: '?',                spotifyId: '' },
         ]
       },
@@ -833,62 +833,14 @@
         ]
       },
       {
-        nom: 'Jours de la semaine', couleur: '#3982a3',
+        nom: 'Jours', couleur: '#3982a3',
         morceaux: [
           { num: 1, reponse: 'MARDI',    spotifyId: '0JEP2DiCi8pRuDzNKeHRlJ', titre: 'Ruby Tuesday', artiste: 'The Rolling Stones' },
           { num: 2, reponse: 'VENDREDI', spotifyId: '263aNAQCeFSWipk896byo6', titre: "Friday I'm in Love", artiste: 'The Cure' },
           { num: 3, reponse: 'DIMANCHE', spotifyId: '2JyaPlr3zItRW7toeTPmBB', titre: 'Sunday Bloody Sunday', artiste: 'U2' },
-          { num: 4, reponse: 'LUNDI',    spotifyId: '6hHc7Pks7wtBIW8Z6A0iFq', titre: 'Blue Monday', artiste: 'New Order' },
-          { num: 5, reponse: 'VENDREDI', spotifyId: '6tVhxgkhyJfB69dY5ZOCKX', titre: 'Last Friday Night', artiste: 'Katy Perry' },
-          { num: 6, reponse: 'DIMANCHE', spotifyId: '6iGoXwENON2onjXpv9bO38', titre: 'Le dimanche à Bamako', artiste: 'Amadou et Mariam' },
-          { num: 7, reponse: 'LUNDI',    spotifyId: '47IaFTwoFbuMJd2sL1ZfMt', titre: 'Le lundi au soleil', artiste: 'Claude François' },
-        ]
-      },
-      {
-        nom: 'Ville', couleur: '#e8375f',
-        morceaux: [
-          { num: 1, reponse: 'KANSAS',       spotifyId: '4DMKwE2E2iYDKY01C335U', titre: 'Kansas', artiste: 'Kansas' },
-          { num: 2, reponse: 'PARIS',        spotifyId: '4MOoJ1lzf7xXCBSzpE62Bp', titre: "J'ai deux amours", artiste: 'Joséphine Baker' },
-          { num: 3, reponse: 'VESOUL',       spotifyId: '13oLwOhAV2GC1Q9Vkp5jb8', titre: 'Vesoul', artiste: 'Jacques Brel' },
-          { num: 4, reponse: 'LOS ANGELES',  spotifyId: '2v6wQvDVtfYuTW2dtT9XSs', titre: 'L.A. Woman', artiste: 'The Doors' },
-          { num: 5, reponse: 'PHILADELPHIE', spotifyId: '5Nj8kBJdpJJ4I9wxQyp8JH', titre: 'Streets of Philadelphia', artiste: 'Bruce Springsteen' },
-          { num: 6, reponse: 'TENNESSEE',    spotifyId: '01JT9PAUZcUTEAL6yDJQ6Z', titre: 'Quelque chose de Tennessee', artiste: 'Johnny Hallyday' },
-          { num: 7, reponse: 'NEW YORK',     spotifyId: '2igwFfvr1OAGX9SKDCPBwO', titre: 'Empire State of Mind', artiste: 'Jay-Z' },
-        ]
-      },
-      {
-        nom: 'Biopic 1', couleur: '#f59923',
-        morceaux: [
-          { num: 1, reponse: 'CONTROL',            spotifyId: '7k42ztYdHyKWrKrENxwjkV', titre: 'Atmosphere', artiste: 'Joy Division' },
-          { num: 2, reponse: 'BACKBEAT',            spotifyId: '2TEiHjVHA280pIHMm0areS', titre: 'Now and Then', artiste: 'The Beatles' },
-          { num: 3, reponse: 'STARDUST',            spotifyId: '25ceFvWSaI3zoy9hhNYDqu', titre: 'Cat People', artiste: 'David Bowie' },
-          { num: 4, reponse: 'BOHEMIAN RHAPSODY',   spotifyId: '5hHpNI203ne4TmVP3c9LPq', titre: 'Las Palabras de Amor', artiste: 'Queen' },
-          { num: 5, reponse: '?', spotifyId: '' }, // ⚠️ Rocketman / Sacrifice — ID fourni (0e3yhVeNaTfKIWQRw9U9) trop court, à redonner
-          { num: 6, reponse: 'ELVIS',               spotifyId: '7KWoeBqSdZHEloYKVxssfG', titre: 'In the Ghetto', artiste: 'Elvis Presley' },
-          { num: 7, reponse: 'BOB MARLEY: ONE LOVE', spotifyId: '1EiMF6r1Ox9nXxjklpUX7v', titre: 'Rat Race', artiste: 'Bob Marley' },
-        ]
-      },
-      {
-        nom: 'Biopic 2', couleur: '#fecd4f',
-        morceaux: [
-          { num: 1, reponse: 'BETTER MAN',          spotifyId: '7MTdv6v3vsmQcVfh7eIaks', titre: 'Tripping', artiste: 'Robbie Williams' },
-          { num: 2, reponse: 'A COMPLETE UNKNOWN',  spotifyId: '3AhXZa8sUQht0UEdBJgpGc', titre: 'Like a Rolling Stone', artiste: 'Bob Dylan' },
-          { num: 3, reponse: 'BACK TO BLACK',       spotifyId: '4zQuwW24dweWcaX0fEJkP2', titre: "You Know I'm No Good", artiste: 'Amy Winehouse' },
-          { num: 4, reponse: 'THE DOORS',           spotifyId: '4KGMuqdT1XEzzOJDJFXu7T', titre: 'The End', artiste: 'The Doors' },
-          { num: 5, reponse: 'GREAT BALLS OF FIRE',  spotifyId: '5UvE5QlINnvEc7aFO14DVL', titre: 'Great Balls of Fire', artiste: 'Jerry Lee Lewis' },
-          { num: 6, reponse: 'RAY',                 spotifyId: '22PjDmIT2S8upSueZN300S', titre: 'Hit the Road Jack', artiste: 'Ray Charles' },
-          { num: 7, reponse: 'GET ON UP',           spotifyId: '7Lo1WgDyUkHowqThyRClzD', titre: 'Get Up Offa That Thing', artiste: 'James Brown' },
-        ]
-      },
-      {
-        nom: 'Biopic 3', couleur: '#77ba4e',
-        morceaux: [
-          { num: 1, reponse: 'RESPECT',                       spotifyId: '7s25THrKz86DM225dOYwnr', titre: 'Respect', artiste: 'Aretha Franklin' },
-          { num: 2, reponse: 'MILES AHEAD',                   spotifyId: '0aWMVrwxPNYkKmFthzmpRi', titre: 'Blue in Green', artiste: 'Miles Davis' },
-          { num: 3, reponse: '8 MILE',                        spotifyId: '5Z01UMMf7V1o0MzF86s6WJ', titre: 'Lose Yourself', artiste: 'Eminem' },
-          { num: 4, reponse: 'LA MÔME',                       spotifyId: '3dkIE8P7hvl3tHl9KSb6dA', titre: 'Je ne regrette rien', artiste: 'Édith Piaf' },
-          { num: 5, reponse: 'AMADEUS',                       spotifyId: '7mgIQzCDcafYFkMMS3Bqvb', titre: 'Requiem in D minor', artiste: 'Mozart' },
-          { num: 6, reponse: "WHAT'S LOVE GOT TO DO WITH IT", spotifyId: '3ErsOxqe2RmXkR65wkygDz', titre: "What's Love Got to Do with It", artiste: 'Tina Turner' },
+          { num: 4, reponse: '?', spotifyId: '' },
+          { num: 5, reponse: '?', spotifyId: '' },
+          { num: 6, reponse: '?', spotifyId: '' },
           { num: 7, reponse: '?', spotifyId: '' },
         ]
       },
