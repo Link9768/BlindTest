@@ -27,7 +27,8 @@ Partiels : Créature (2/7), Chiffre/Nombre (6/7), Film 2 (6/7), Séries 1 (6/7),
 Vides : Chanteur, Décennie.
 
 ⚠️ **Points à vérifier avec l'utilisateur** :
-- **Biopic 1 #5 (Rocketman / Sacrifice — Elton John)** : ID fourni trop court (20 caractères au lieu de 22), laissé vide, à redonner.
+- ~~Biopic 1 #5 Rocketman~~ corrigé, ID complet fourni.
+- **Biopic 4** (nouveau, 1/7 seulement — Love & Mercy/Beach Boys). Biopics réels identifiés en réserve pour compléter (IDs Spotify à fournir) : Walk the Line (Johnny Cash), Straight Outta Compton (N.W.A), Selena (Selena Quintanilla), Rocketman... déjà utilisé.
 - **Séries 1 #7 "SIX FEET UNDER"** : `spotifyId` vide — l'ID fourni (`2eHj0klWkwRQuIrNlPpCPa`) était une collision avec I'm Every Woman.
 - **Vêtement #2 "Laisse béton" (Renaud)** : aucune réponse fournie ni déductible du titre (pas de référence vêtement identifiée) — `reponse: '?'`.
 - **À ne pas faire 1 #4 "Don't Look Back in Anger" (Oasis)** : réponse non fournie — `reponse: '?'`.
