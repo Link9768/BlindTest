@@ -271,10 +271,11 @@
     }
 
     /* Le widget fait 80px de haut, bouton play ~à droite : on cale l'iframe
-       (générée par le SDK IFrame API à l'intérieur de #spotify-embed)
        pour que son bouton play tombe dans la fenêtre */
-    #spotify-embed { position: absolute; top: -8px; right: -8px; }
-    #spotify-embed iframe {
+    #spotify-embed {
+      position: absolute;
+      top: -8px;
+      right: -8px;
       width: 300px;
       height: 80px;
       border: none;
@@ -439,7 +440,9 @@
         <circle id="timer-circle" cx="55" cy="55" r="45"/>
       </svg>
       <div id="spotify-window">
-        <div id="spotify-embed"></div>
+        <iframe id="spotify-embed"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          src=""></iframe>
       </div>
       <div id="no-track">🚫</div>
     </div>
@@ -914,40 +917,20 @@
     const infosTitre   = document.getElementById('infos-titre');
     const infosArtiste = document.getElementById('infos-artiste');
     const timerCircle  = document.getElementById('timer-circle');
+    let spotifyEmbed = document.getElementById('spotify-embed');
+
+    // Remplace entièrement le nœud iframe (au lieu de juste changer .src) : garantit
+    // un rechargement propre à chaque fois, même quand deux assignations .src successives
+    // seraient fusionnées par le navigateur. Applique à TOUS les thèmes (fonction partagée).
+    function reloadSpotifyEmbed(src) {
+      const fresh = document.createElement('iframe');
+      fresh.id = 'spotify-embed';
+      fresh.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture');
+      fresh.src = src;
+      spotifyEmbed.replaceWith(fresh);
+      spotifyEmbed = fresh;
+    }
     const playZone     = document.getElementById('play-zone');
-
-    // ═══ SDK OFFICIEL SPOTIFY IFRAME API ═══════════════════════════════════
-    // Remplace l'ancien bricolage (recréer l'iframe brute) : le SDK expose un vrai
-    // EmbedController avec .seek(0)/.loadUri(), qui force la position à 0 même quand
-    // Spotify se souviendrait de la dernière position écoutée (compte connecté).
-    let embedController = null;
-    let embedReady = false;
-    let pendingUri = null;
-
-    window.onSpotifyIframeApiReady = (IFrameAPI) => {
-      IFrameAPI.createController(
-        document.getElementById('spotify-embed'),
-        { width: 300, height: 80, uri: 'spotify:track:49wOjOkS4pBK3PQnPnNYjb' },
-        (controller) => {
-          embedController = controller;
-          embedReady = true;
-          bindSpotifyEvents();
-          if (pendingUri) { loadTrack(pendingUri); pendingUri = null; }
-        }
-      );
-    };
-
-    function loadTrack(uri) {
-      if (!embedReady) { pendingUri = uri; return; }
-      embedController.loadUri(uri);
-      // seek(0) après le chargement : garantit le redémarrage au début même si
-      // Spotify tente de reprendre à la dernière position écoutée (compte connecté)
-      setTimeout(() => embedController.seek(0), 300);
-    }
-
-    function stopTrack() {
-      if (embedReady) embedController.pause();
-    }
 
     // ═══ MENU ══════════════════════════════════════════════════════════════
     themes.forEach((t, i) => {
@@ -970,7 +953,7 @@
 
     function showMenu() {
       stopPlay();
-      stopTrack();
+      reloadSpotifyEmbed('');
       screenPlayer.classList.remove('visible');
       screenMenu.classList.add('visible');
     }
@@ -1006,10 +989,12 @@
 
       if (m.spotifyId) {
         playZone.classList.remove('empty');
-        loadTrack(`spotify:track:${m.spotifyId}`);
+        // nœud iframe recréé à chaque fois : garantit que le morceau reparte du début,
+        // même en revisitant le même morceau ou le même thème
+        reloadSpotifyEmbed(`https://open.spotify.com/embed/track/${m.spotifyId}?utm_source=generator&theme=0`);
       } else {
         playZone.classList.add('empty');
-        stopTrack();
+        reloadSpotifyEmbed('');
       }
 
       resetTimer();
@@ -1017,13 +1002,17 @@
       hideReponse();
     }
 
-    // ═══ SYNC SPOTIFY (event natif du SDK, remplace l'ancien postMessage brut) ═══
-    function bindSpotifyEvents() {
-      embedController.addListener('playback_update', (e) => {
-        if (!e.data.isPaused && !isPlaying) startPlay();
-        if (e.data.isPaused && isPlaying) pauseTimer();
-      });
-    }
+    // ═══ SYNC SPOTIFY ══════════════════════════════════════════════════════
+    window.addEventListener('message', (e) => {
+      if (e.origin !== 'https://open.spotify.com') return;
+      try {
+        const data = JSON.parse(e.data);
+        if (data.type === 'playback_update') {
+          if (!data.payload.isPaused && !isPlaying) startPlay();
+          if (data.payload.isPaused && isPlaying) pauseTimer();
+        }
+      } catch (_) {}
+    });
 
     function startPlay() {
       isPlaying = true;
@@ -1127,7 +1116,6 @@
       }
     }
   </script>
-  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 
 </body>
 </html>

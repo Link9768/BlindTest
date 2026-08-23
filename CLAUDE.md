@@ -81,22 +81,20 @@ CŒUR (Heart of Glass), HANCHES (Hips Don't Lie), VISAGE (Ma Gueule), CŒUR (My 
 - Timer : petit segment vert `#77ba4e` qui tourne autour de l'anneau en 30s (sens horaire, via `stroke-dashoffset` négatif), passe rouge `#e8375f` à 0
 - Bandeau réponse : `rgba(0,80,137,0.51)`
 
-### Widget Spotify — SDK officiel IFrame API
+### Widget Spotify
 
-Remplace l'ancien bricolage (iframe brute rechargée en changeant `.src`, puis recréation du nœud DOM) : on utilise maintenant le vrai [SDK Spotify IFrame API](https://developer.spotify.com/documentation/embeds/references/iframe-api) (`https://open.spotify.com/embed/iframe-api/v1`, chargé en fin de `<body>`, **après** le script principal pour garantir que `window.onSpotifyIframeApiReady` existe déjà avant que le SDK async ne s'exécute).
+- iframe brute (`open.spotify.com/embed/track/{id}?utm_source=generator&theme=0`) dans `#spotify-window` (fenêtre circulaire 64px, `overflow: hidden`) calée pour ne montrer que le bouton play du widget — `transform: scale(1.5)` + `transform-origin: calc(100% - 28px) 46px`
+- Nœud iframe recréé à chaque changement de morceau (`reloadSpotifyEmbed`) plutôt que juste changer `.src` : garantit un rechargement propre
+- Sync play/pause via `postMessage` (`playback_update`)
+- Morceau sans `spotifyId` → icône 🚫 à la place du play
 
-- `IFrameAPI.createController(el, {width, height, uri}, callback)` crée un unique `EmbedController` réutilisé pour toute la session (pas recréé à chaque morceau)
-- `loadTrack(uri)` → `embedController.loadUri(uri)` puis `seek(0)` après 300ms : **force la position à 0 même si Spotify se souvient de la dernière position écoutée** (bug découvert : compte connecté = Spotify reprend où on s'était arrêté au lieu de redémarrer)
-- `stopTrack()` → `embedController.pause()`
-- Sync play/pause via `embedController.addListener('playback_update', ...)` (remplace l'ancien `window.addEventListener('message', ...)` sur postMessage brut)
-- `#spotify-embed` est un `<div>` (pas une iframe) dans lequel le SDK injecte sa propre iframe — CSS ciblant `#spotify-embed iframe` pour le zoom/recadrage sur le bouton play
-- Morceau sans `spotifyId` → icône 🚫 à la place du play (inchangé)
+⚠️ **Tentative abandonnée (2026-08) : SDK officiel Spotify IFrame API.** Remplacé l'iframe brute par `IFrameAPI.createController()` + `seek(0)` forcé pour régler le bug "reprend à la dernière position écoutée au lieu de redémarrer" (repro : Créature #1 Zombie/Cranberries, compte connecté). Techniquement ça aurait dû corriger le bug, mais **casse l'affichage** : le bouton play redevient invisible/mal calé (cause exacte non identifiée — possiblement le SDK génère une structure DOM différente que la fenêtre de recadrage CSS ne cible plus correctement). **Rollback fait, ne pas retenter sans vérification visuelle réelle (screenshot) à chaque étape.** Le bug "reprend où on s'était arrêté" reste non résolu, mais secondaire vu qu'il ne se produit que si la connexion Spotify passe (rare sur mobile, cf. note ci-dessous).
 
 ### Lecture depuis le début
 
-L'embed sans connexion joue un extrait 30s choisi par Spotify (souvent le refrain) — limite plateforme, pas de fix code possible. Avec un compte connecté, Spotify peut reprendre à la dernière position écoutée au lieu de redémarrer : réglé par le `seek(0)` forcé ci-dessus.
+L'embed sans connexion joue un extrait 30s choisi par Spotify (souvent le refrain). Connecté à un compte Premium dans le même navigateur → en théorie morceau complet depuis le début, mais peut aussi reprendre à la dernière position écoutée plutôt que redémarrer (bug non résolu, cf. ci-dessus). Aucun paramètre d'URL simple ne force la position à 0 sur l'iframe brute.
 
-⚠️ **Connexion Spotify sur mobile (Samsung Internet/Chrome)** : la session `accounts.spotify.com` ne se propage généralement pas à l'iframe `open.spotify.com` (cookies tiers bloqués par défaut) → limite structurelle, décision utilisateur = rester sur extraits 30s, ne pas retenter de fix cosmétique sans repartir d'un vrai besoin validé.
+⚠️ **Connexion Spotify sur mobile (Samsung Internet/Chrome)** : la session `accounts.spotify.com` ne se propage généralement pas à l'iframe `open.spotify.com` (cookies tiers bloqués par défaut) → limite structurelle. Décision utilisateur (2026-08) : rester sur extraits 30s, ne pas retenter de fix sans repartir d'un vrai besoin validé.
 
 ## Ce qui reste à faire
 
