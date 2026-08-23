@@ -944,6 +944,9 @@
     function loadTrack(uri) {
       if (!embedReady) { pendingUri = uri; return; }
       embedController.loadUri(uri);
+      // seek(0) après le chargement : force le redémarrage au début même si Spotify
+      // tente de reprendre à la dernière position écoutée (compte connecté)
+      setTimeout(() => embedController.seek(0), 300);
       btnPlay.disabled = false;
       btnPlay.classList.remove('playing');
     }
