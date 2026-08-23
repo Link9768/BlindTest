@@ -120,6 +120,19 @@
     #btn-spotify-login:hover { filter: brightness(1.1); }
     /* Connecté : le bouton devient un simple indicateur, plus un bouton d'action */
     #btn-spotify-login:disabled { cursor: default; opacity: 0.85; }
+    /* Diagnostic affiché à l'écran (console inaccessible sur mobile) */
+    #diag {
+      display: none;
+      max-width: 90%;
+      font-size: 0.7rem;
+      line-height: 1.4;
+      color: #ffd27a;
+      background: rgba(0,0,0,0.4);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      word-break: break-all;
+    }
 
     /* ═══════════ ÉCRAN PLAYER ═══════════ */
 
@@ -424,6 +437,7 @@
     <h1>DJ Set</h1>
     <div id="themes-grid"><!-- généré par JS --></div>
     <button id="btn-spotify-login" onclick="spotifyLogin()">● Connexion Spotify</button>
+    <p id="diag"></p>
   </div>
 
   <!-- ═══════════ ÉCRAN PLAYER ═══════════ -->
@@ -467,6 +481,15 @@
   </div>
 
   <script>
+    // Capte toute erreur JS et l'affiche à l'écran (console inaccessible sur mobile)
+    window.addEventListener('error', (e) => {
+      const el = document.getElementById('diag');
+      if (el) {
+        el.textContent = 'Erreur JS : ' + e.message + ' (ligne ' + e.lineno + ')';
+        el.style.display = 'block';
+      }
+    });
+
     // ═══ DONNÉES ═══════════════════════════════════════════════════════════
     // 7 morceaux par thème : { num, reponse, spotifyId }
     // spotifyId : partager le morceau sur Spotify → l'ID est dans l'URL
@@ -959,6 +982,7 @@
     // redirection déclenchée APRÈS un await sort du geste utilisateur et se fait
     // bloquer par le navigateur — le clic doit rediriger de façon synchrone.
     let authUrlReady = null;
+    let prepareError = null;
 
     async function prepareAuthUrl() {
       try {
@@ -977,15 +1001,32 @@
       } catch (e) {
         // crypto.subtle indisponible (contexte non sécurisé / navigateur ancien)
         authUrlReady = null;
-        const btn = document.getElementById('btn-spotify-login');
-        if (btn) { btn.textContent = '⚠ Connexion indisponible ici'; btn.disabled = true; }
+        prepareError = (e && e.message) ? e.message : String(e);
       }
     }
 
+    // Affiche l'état à l'écran : impossible de lire la console d'un téléphone,
+    // donc l'app doit dire elle-même ce qui bloque.
+    function diag(msg) {
+      const el = document.getElementById('diag');
+      if (el) { el.textContent = msg; el.style.display = 'block'; }
+    }
+
     function spotifyLogin() {
-      if (!authUrlReady) return; // préparation pas encore terminée (quelques ms)
-      localStorage.setItem('sp_verifier', authUrlReady.verifier);
-      location.href = authUrlReady.url;
+      try {
+        if (!authUrlReady) {
+          diag('Bloqué : URL non préparée. crypto.subtle=' + (window.crypto && crypto.subtle ? 'ok' : 'ABSENT') +
+               ' | secure=' + window.isSecureContext + ' | erreur=' + (prepareError || 'aucune'));
+          return;
+        }
+        localStorage.setItem('sp_verifier', authUrlReady.verifier);
+        diag('Redirection en cours…');
+        location.href = authUrlReady.url;
+        // Si après 1,5s on est toujours là, c'est que la navigation a été bloquée
+        setTimeout(() => diag('Redirection bloquée par le navigateur. URL : ' + authUrlReady.url), 1500);
+      } catch (e) {
+        diag('Erreur au clic : ' + (e && e.message ? e.message : e));
+      }
     }
 
     async function exchangeCode(code) {
