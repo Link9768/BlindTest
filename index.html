@@ -120,18 +120,36 @@
     #btn-spotify-login:hover { filter: brightness(1.1); }
     /* Connecté : le bouton devient un simple indicateur, plus un bouton d'action */
     #btn-spotify-login:disabled { cursor: default; opacity: 0.85; }
-    /* Diagnostic affiché à l'écran (console inaccessible sur mobile) */
+    /* Diagnostic : overlay fixe, visible quel que soit le scroll de la page */
     #diag {
       display: none;
-      max-width: 90%;
-      font-size: 0.7rem;
-      line-height: 1.4;
-      color: #ffd27a;
-      background: rgba(0,0,0,0.4);
-      border-radius: 8px;
-      padding: 8px 12px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: #111;
+      background: #ffd27a;
+      padding: 12px 16px;
       text-align: center;
-      word-break: break-all;
+      word-break: break-word;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    }
+    #diag a {
+      display: inline-block;
+      margin-top: 8px;
+      background: #1db954;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 20px;
+    }
+    #diag .close {
+      position: absolute;
+      top: 6px; right: 12px;
+      font-weight: 900;
+      cursor: pointer;
     }
 
     /* ═══════════ ÉCRAN PLAYER ═══════════ */
@@ -1007,25 +1025,37 @@
 
     // Affiche l'état à l'écran : impossible de lire la console d'un téléphone,
     // donc l'app doit dire elle-même ce qui bloque.
-    function diag(msg) {
+    function diag(msg, linkUrl) {
       const el = document.getElementById('diag');
-      if (el) { el.textContent = msg; el.style.display = 'block'; }
+      if (!el) return;
+      el.innerHTML = '<span class="close" onclick="document.getElementById(\'diag\').style.display=\'none\'">✕</span>' + msg;
+      if (linkUrl) {
+        // Un vrai lien <a> : une navigation par lien n'est jamais bloquée par le
+        // navigateur, contrairement à une redirection déclenchée en JavaScript.
+        const a = document.createElement('a');
+        a.href = linkUrl;
+        a.textContent = 'Ouvrir la connexion Spotify';
+        el.appendChild(document.createElement('br'));
+        el.appendChild(a);
+      }
+      el.style.display = 'block';
     }
 
     function spotifyLogin() {
       try {
         if (!authUrlReady) {
-          diag('Bloqué : URL non préparée. crypto.subtle=' + (window.crypto && crypto.subtle ? 'ok' : 'ABSENT') +
-               ' | secure=' + window.isSecureContext + ' | erreur=' + (prepareError || 'aucune'));
+          diag('Bloqué : URL non préparée.<br>crypto.subtle=' + (window.crypto && crypto.subtle ? 'ok' : 'ABSENT') +
+               ' | secure=' + window.isSecureContext + '<br>erreur=' + (prepareError || 'aucune'));
           return;
         }
         localStorage.setItem('sp_verifier', authUrlReady.verifier);
-        diag('Redirection en cours…');
+        // Le lien est proposé immédiatement : si la redirection JS est bloquée,
+        // un appui sur le lien fonctionnera à coup sûr.
+        diag('Si rien ne se passe, appuie sur le bouton vert :', authUrlReady.url);
         location.href = authUrlReady.url;
-        // Si après 1,5s on est toujours là, c'est que la navigation a été bloquée
-        setTimeout(() => diag('Redirection bloquée par le navigateur. URL : ' + authUrlReady.url), 1500);
       } catch (e) {
-        diag('Erreur au clic : ' + (e && e.message ? e.message : e));
+        diag('Erreur au clic : ' + (e && e.message ? e.message : e),
+             authUrlReady ? authUrlReady.url : null);
       }
     }
 
