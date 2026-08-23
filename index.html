@@ -891,7 +891,7 @@
         nom: 'Biopic 4', couleur: '#3982a3',
         morceaux: [
           { num: 1, reponse: 'LOVE & MERCY', spotifyId: '0ObrXLrfrqJUNc8RfmIBHP', titre: 'God Only Knows', artiste: 'The Beach Boys' },
-          { num: 2, reponse: '?', spotifyId: '' },
+          { num: 2, reponse: 'WALK THE LINE', spotifyId: '28cnXtME493VX9NOw9cIUh', titre: 'Hurt', artiste: 'Johnny Cash' },
           { num: 3, reponse: '?', spotifyId: '' },
           { num: 4, reponse: '?', spotifyId: '' },
           { num: 5, reponse: '?', spotifyId: '' },
@@ -955,20 +955,37 @@
         .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
     }
 
-    async function spotifyLogin() {
-      const verifier = randomString(64);
-      localStorage.setItem('sp_verifier', verifier);
-      const hashed = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
-      const url = new URL('https://accounts.spotify.com/authorize');
-      url.search = new URLSearchParams({
-        response_type: 'code',
-        client_id: SPOTIFY_CLIENT_ID,
-        scope: SCOPES,
-        code_challenge_method: 'S256',
-        code_challenge: base64url(hashed),
-        redirect_uri: REDIRECT_URI,
-      }).toString();
-      location.href = url.toString();
+    // URL d'autorisation préparée au chargement (pas au clic) : sur mobile, une
+    // redirection déclenchée APRÈS un await sort du geste utilisateur et se fait
+    // bloquer par le navigateur — le clic doit rediriger de façon synchrone.
+    let authUrlReady = null;
+
+    async function prepareAuthUrl() {
+      try {
+        const verifier = randomString(64);
+        const hashed = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+        const url = new URL('https://accounts.spotify.com/authorize');
+        url.search = new URLSearchParams({
+          response_type: 'code',
+          client_id: SPOTIFY_CLIENT_ID,
+          scope: SCOPES,
+          code_challenge_method: 'S256',
+          code_challenge: base64url(hashed),
+          redirect_uri: REDIRECT_URI,
+        }).toString();
+        authUrlReady = { url: url.toString(), verifier };
+      } catch (e) {
+        // crypto.subtle indisponible (contexte non sécurisé / navigateur ancien)
+        authUrlReady = null;
+        const btn = document.getElementById('btn-spotify-login');
+        if (btn) { btn.textContent = '⚠ Connexion indisponible ici'; btn.disabled = true; }
+      }
+    }
+
+    function spotifyLogin() {
+      if (!authUrlReady) return; // préparation pas encore terminée (quelques ms)
+      localStorage.setItem('sp_verifier', authUrlReady.verifier);
+      location.href = authUrlReady.url;
     }
 
     async function exchangeCode(code) {
@@ -1130,7 +1147,8 @@
       btn.disabled = useSdk;
     }
 
-    // Au chargement : récupère le code OAuth s'il y en a un dans l'URL
+    // Au chargement : récupère le code OAuth s'il y en a un dans l'URL,
+    // puis prépare l'URL d'autorisation pour que le prochain clic soit synchrone
     (async () => {
       const params = new URLSearchParams(location.search);
       const code = params.get('code');
@@ -1140,6 +1158,7 @@
         history.replaceState({}, '', REDIRECT_URI);
       }
       updateLoginUi();
+      await prepareAuthUrl();
     })();
 
     // ═══ MENU ══════════════════════════════════════════════════════════════
