@@ -7,7 +7,7 @@ Application web mobile (fichier HTML unique) utilisée pendant un DJ set comme o
 ## Versions
 
 - **V1** : `../app DJ set.html` — version mono-thème (Créature), fonctionnelle, **ne pas modifier**
-- **V2** : `app DJ set v2.html` — version multi-thèmes, design inspiré de djset.olemains.com
+- **V2** : `index.html` — version multi-thèmes, design inspiré de djset.olemains.com. Renommé depuis `app DJ set v2.html` (URL propre sans espaces, requis pour l'OAuth Spotify). URL en ligne : `https://link9768.github.io/DJSet/`
 
 ## V2 — Architecture (fichier unique)
 
@@ -16,17 +16,18 @@ Application web mobile (fichier HTML unique) utilisée pendant un DJ set comme o
 1. **Menu** (`#screen-menu`) : grille de 10 tuiles thèmes + bouton "Connexion Spotify" (ouvre `accounts.spotify.com/login` — une fois connecté dans le navigateur, les embeds jouent les morceaux complets depuis le début, pour toute la session)
 2. **Player** (`#screen-player`) : carrousel disques vinyle superposés, bandeau "Voir la réponse" pleine largeur, bouton play central avec anneau timer vert, bouton "← Menu", "Suivant →"
 
-### Thèmes (34)
+### Thèmes (37)
 
-Créature, Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Chanteur, Réalisateur, Groupe 1-3, Film 1-2, Séries 1-4, Pays 1-2, Sport, Décennie, Hommes et Femmes 1-4, Couleur, Vêtement, Nom de famille, À ne pas faire 1-2, Il faut, Lieux 1-2, Jours.
+Créature, Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Chanteur, Réalisateur, Groupe 1-3, Film 1-2, Séries 1-4, Pays 1-2, Sport, Décennie, Hommes et Femmes 1-4, Couleur, Vêtement, Nom de famille, À ne pas faire 1-2, Il faut, Lieux 1-2, Jours, Biopic 1-3.
 
-Toute catégorie dont la liste fournie dépasse 7 morceaux → scindée en sous-catégories numérotées (Séries, Pays, Film, Groupe, Hommes et Femmes, À ne pas faire, Lieux). Pattern à réutiliser systématiquement.
+Toute catégorie dont la liste fournie dépasse 7 morceaux → scindée en sous-catégories numérotées (Séries, Pays, Film, Groupe, Hommes et Femmes, À ne pas faire, Lieux, Biopic). Pattern à réutiliser systématiquement.
 
-Renseignés complets ✅ : Animaux, Météo/Saisons, Partie du corps, Hommes et Femmes 1-2, Réalisateur, Film 1, Séries 2, Pays 1, Groupe 1-3, Lieux 1.
-Partiels : Créature (2/7), Chiffre/Nombre (6/7), Film 2 (6/7), Séries 1 (6/7), Séries 3 (5/7), Séries 4 (3/7), Pays 2 (4/7), Sport (6/7), Hommes et Femmes 3 (6/7), Hommes et Femmes 4 (5/7), Couleur (6/7), Vêtement (2 confirmés + 1 flag), Nom de famille (6/7, réponses déduites), À ne pas faire 1 (6/7 + 1 flag), À ne pas faire 2 (2/7), Il faut (2/7, réponses déduites), Lieux 2 (3/7), Jours (3/7).
+Renseignés complets ✅ : Animaux, Météo/Saisons, Partie du corps, Hommes et Femmes 1-2, Réalisateur, Film 1, Séries 2, Pays 1, Groupe 1-3, Lieux 1, Biopic 2.
+Partiels : Créature (2/7), Chiffre/Nombre (6/7), Film 2 (6/7), Séries 1 (6/7), Séries 3 (5/7), Séries 4 (3/7), Pays 2 (4/7), Sport (6/7), Hommes et Femmes 3 (6/7), Hommes et Femmes 4 (5/7), Couleur (6/7), Vêtement (2 confirmés + 1 flag), Nom de famille (6/7, réponses déduites), À ne pas faire 1 (6/7 + 1 flag), À ne pas faire 2 (2/7), Il faut (2/7, réponses déduites), Lieux 2 (3/7), Jours (3/7), Biopic 1 (6/7 + 1 flag), Biopic 3 (6/7).
 Vides : Chanteur, Décennie.
 
 ⚠️ **Points à vérifier avec l'utilisateur** :
+- **Biopic 1 #5 (Rocketman / Sacrifice — Elton John)** : ID fourni trop court (20 caractères au lieu de 22), laissé vide, à redonner.
 - **Séries 1 #7 "SIX FEET UNDER"** : `spotifyId` vide — l'ID fourni (`2eHj0klWkwRQuIrNlPpCPa`) était une collision avec I'm Every Woman.
 - **Vêtement #2 "Laisse béton" (Renaud)** : aucune réponse fournie ni déductible du titre (pas de référence vêtement identifiée) — `reponse: '?'`.
 - **À ne pas faire 1 #4 "Don't Look Back in Anger" (Oasis)** : réponse non fournie — `reponse: '?'`.
