@@ -258,31 +258,38 @@
       margin-bottom: 26px;
     }
 
-    /* Fenêtre qui ne laisse voir que le bouton play du widget Spotify */
+    /* L'iframe Spotify est totalement masquée : on ne dépend plus de sa mise en
+       page (elle change entre les états et le bouton se déplaçait). Le contrôle
+       passe par le SDK, l'affichage par notre propre bouton ci-dessous. */
     #spotify-window {
+      position: absolute;
+      width: 1px; height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Notre bouton play/pause : position fixe, 2 états seulement */
+    #btn-play {
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       width: 64px; height: 64px;
+      border: none;
       border-radius: 50%;
-      overflow: hidden;
       background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
       z-index: 2;
     }
-
-    /* Le widget fait 80px de haut, bouton play ~à droite : on cale l'iframe
-       pour que son bouton play tombe dans la fenêtre */
-    #spotify-embed {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      width: 300px;
-      height: 80px;
-      border: none;
-      /* zoom sur le bouton play pour masquer les éléments voisins du widget */
-      transform: scale(1.5);
-      transform-origin: calc(100% - 28px) 46px;
-    }
+    #btn-play svg { width: 26px; height: 26px; fill: var(--darkblue); }
+    #btn-play .icon-pause { display: none; }
+    #btn-play.playing .icon-play  { display: none; }
+    #btn-play.playing .icon-pause { display: block; }
+    #btn-play:disabled { opacity: 0.5; cursor: default; }
 
     /* Anneau sombre autour du play */
     #play-ring {
@@ -322,7 +329,7 @@
       z-index: 3;
     }
     #play-zone.empty #no-track { display: flex; }
-    #play-zone.empty #spotify-window { display: none; }
+    #play-zone.empty #btn-play { display: none; }
 
     /* ─── Navigation ─── */
     #nav-bar {
@@ -439,11 +446,11 @@
         <circle id="ring-bg" cx="55" cy="55" r="45"/>
         <circle id="timer-circle" cx="55" cy="55" r="45"/>
       </svg>
-      <div id="spotify-window">
-        <iframe id="spotify-embed"
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          src=""></iframe>
-      </div>
+      <div id="spotify-window"><div id="spotify-embed"></div></div>
+      <button id="btn-play" onclick="togglePlay()" disabled>
+        <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      </button>
       <div id="no-track">🚫</div>
     </div>
 
@@ -869,20 +876,50 @@
     const infosTitre   = document.getElementById('infos-titre');
     const infosArtiste = document.getElementById('infos-artiste');
     const timerCircle  = document.getElementById('timer-circle');
-    let spotifyEmbed = document.getElementById('spotify-embed');
-
-    // Remplace entièrement le nœud iframe (au lieu de juste changer .src) : garantit
-    // un rechargement propre à chaque fois, même quand deux assignations .src successives
-    // seraient fusionnées par le navigateur. Applique à TOUS les thèmes (fonction partagée).
-    function reloadSpotifyEmbed(src) {
-      const fresh = document.createElement('iframe');
-      fresh.id = 'spotify-embed';
-      fresh.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture');
-      fresh.src = src;
-      spotifyEmbed.replaceWith(fresh);
-      spotifyEmbed = fresh;
-    }
     const playZone     = document.getElementById('play-zone');
+    const btnPlay      = document.getElementById('btn-play');
+
+    // ═══ SPOTIFY (SDK IFrame API, iframe masquée) ══════════════════════════
+    // L'iframe Spotify est cachée : son bouton natif changeait de position selon
+    // l'état, ce qui rendait le contrôle impossible. On pilote via le SDK et on
+    // affiche notre propre bouton, toujours au même endroit, avec 2 états.
+    let embedController = null;
+    let embedReady = false;
+    let pendingUri = null;
+
+    window.onSpotifyIframeApiReady = (IFrameAPI) => {
+      IFrameAPI.createController(
+        document.getElementById('spotify-embed'),
+        { width: 300, height: 80, uri: 'spotify:track:49wOjOkS4pBK3PQnPnNYjb' },
+        (controller) => {
+          embedController = controller;
+          embedReady = true;
+          controller.addListener('playback_update', (e) => {
+            const paused = e.data.isPaused;
+            btnPlay.classList.toggle('playing', !paused);
+            if (!paused && !isPlaying) startPlay();
+            if (paused && isPlaying) pauseTimer();
+          });
+          if (pendingUri) { loadTrack(pendingUri); pendingUri = null; }
+        }
+      );
+    };
+
+    function loadTrack(uri) {
+      if (!embedReady) { pendingUri = uri; return; }
+      embedController.loadUri(uri);
+      btnPlay.disabled = false;
+      btnPlay.classList.remove('playing');
+    }
+
+    function togglePlay() {
+      if (embedReady) embedController.togglePlay();
+    }
+
+    function stopTrack() {
+      if (embedReady) embedController.pause();
+      btnPlay.classList.remove('playing');
+    }
 
     // ═══ MENU ══════════════════════════════════════════════════════════════
     themes.forEach((t, i) => {
@@ -905,7 +942,7 @@
 
     function showMenu() {
       stopPlay();
-      reloadSpotifyEmbed('');
+      stopTrack();
       screenPlayer.classList.remove('visible');
       screenMenu.classList.add('visible');
     }
@@ -941,30 +978,16 @@
 
       if (m.spotifyId) {
         playZone.classList.remove('empty');
-        // nœud iframe recréé à chaque fois : garantit que le morceau reparte du début,
-        // même en revisitant le même morceau ou le même thème
-        reloadSpotifyEmbed(`https://open.spotify.com/embed/track/${m.spotifyId}?utm_source=generator&theme=0`);
+        loadTrack(`spotify:track:${m.spotifyId}`);
       } else {
         playZone.classList.add('empty');
-        reloadSpotifyEmbed('');
+        stopTrack();
       }
 
       resetTimer();
       stopPlay();
       hideReponse();
     }
-
-    // ═══ SYNC SPOTIFY ══════════════════════════════════════════════════════
-    window.addEventListener('message', (e) => {
-      if (e.origin !== 'https://open.spotify.com') return;
-      try {
-        const data = JSON.parse(e.data);
-        if (data.type === 'playback_update') {
-          if (!data.payload.isPaused && !isPlaying) startPlay();
-          if (data.payload.isPaused && isPlaying) pauseTimer();
-        }
-      } catch (_) {}
-    });
 
     function startPlay() {
       isPlaying = true;
@@ -1068,6 +1091,9 @@
       }
     }
   </script>
+  <!-- Chargé APRÈS le script principal : window.onSpotifyIframeApiReady doit
+       exister avant que le SDK (async) ne s'exécute et l'appelle. -->
+  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 
 </body>
 </html>
