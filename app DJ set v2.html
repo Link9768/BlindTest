@@ -927,7 +927,7 @@
     window.onSpotifyIframeApiReady = (IFrameAPI) => {
       IFrameAPI.createController(
         document.getElementById('spotify-embed'),
-        { width: '300', height: '80', uri: 'spotify:track:49wOjOkS4pBK3PQnPnNYjb' },
+        { width: 300, height: 80, uri: 'spotify:track:49wOjOkS4pBK3PQnPnNYjb' },
         (controller) => {
           embedController = controller;
           embedReady = true;
