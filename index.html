@@ -119,7 +119,8 @@
     }
     #btn-spotify-login:hover { filter: brightness(1.1); }
     /* Connecté : le bouton devient un simple indicateur, plus un bouton d'action */
-    #btn-spotify-login:disabled { cursor: default; opacity: 0.85; }
+    #btn-spotify-login { text-decoration: none; justify-content: center; }
+    #btn-spotify-login.connected { cursor: default; opacity: 0.85; }
     /* Diagnostic : overlay fixe, visible quel que soit le scroll de la page */
     #diag {
       display: none;
@@ -454,7 +455,7 @@
   <div id="screen-menu" class="screen visible">
     <h1>DJ Set</h1>
     <div id="themes-grid"><!-- généré par JS --></div>
-    <button id="btn-spotify-login" onclick="spotifyLogin()">● Connexion Spotify</button>
+    <a id="btn-spotify-login" href="#" onclick="return spotifyLogin(event)">● Connexion Spotify</a>
     <p id="diag"></p>
   </div>
 
@@ -1016,6 +1017,11 @@
           redirect_uri: REDIRECT_URI,
         }).toString();
         authUrlReady = { url: url.toString(), verifier };
+        // Le lien pointe directement vers Spotify : une navigation par lien n'est
+        // jamais bloquée par le navigateur, contrairement à location.href en JS
+        // (cause du bouton inerte sur mobile).
+        const btn = document.getElementById('btn-spotify-login');
+        if (btn && !useSdk) btn.setAttribute('href', authUrlReady.url);
       } catch (e) {
         // crypto.subtle indisponible (contexte non sécurisé / navigateur ancien)
         authUrlReady = null;
@@ -1041,22 +1047,18 @@
       el.style.display = 'block';
     }
 
-    function spotifyLogin() {
-      try {
-        if (!authUrlReady) {
-          diag('Bloqué : URL non préparée.<br>crypto.subtle=' + (window.crypto && crypto.subtle ? 'ok' : 'ABSENT') +
-               ' | secure=' + window.isSecureContext + '<br>erreur=' + (prepareError || 'aucune'));
-          return;
-        }
-        localStorage.setItem('sp_verifier', authUrlReady.verifier);
-        // Le lien est proposé immédiatement : si la redirection JS est bloquée,
-        // un appui sur le lien fonctionnera à coup sûr.
-        diag('Si rien ne se passe, appuie sur le bouton vert :', authUrlReady.url);
-        location.href = authUrlReady.url;
-      } catch (e) {
-        diag('Erreur au clic : ' + (e && e.message ? e.message : e),
-             authUrlReady ? authUrlReady.url : null);
+    // Le lien porte déjà l'URL Spotify (href) : on se contente d'enregistrer le
+    // verifier avant que le navigateur suive le lien nativement.
+    function spotifyLogin(event) {
+      if (useSdk) { if (event) event.preventDefault(); return false; }
+      if (!authUrlReady) {
+        if (event) event.preventDefault();
+        diag('Bloqué : URL non préparée.<br>crypto.subtle=' + (window.crypto && crypto.subtle ? 'ok' : 'ABSENT') +
+             ' | secure=' + window.isSecureContext + '<br>erreur=' + (prepareError || 'aucune'));
+        return false;
       }
+      localStorage.setItem('sp_verifier', authUrlReady.verifier);
+      return true; // laisse le navigateur suivre le href
     }
 
     async function exchangeCode(code) {
@@ -1215,7 +1217,10 @@
       const btn = document.getElementById('btn-spotify-login');
       if (!btn) return;
       btn.textContent = useSdk ? '✓ Spotify connecté — morceaux complets' : '● Connexion Spotify';
-      btn.disabled = useSdk;
+      // C'est un <a>, pas un <button> : on neutralise le lien via la classe
+      btn.classList.toggle('connected', useSdk);
+      if (useSdk) btn.removeAttribute('href');
+      else if (authUrlReady) btn.setAttribute('href', authUrlReady.url);
     }
 
     // Au chargement : récupère le code OAuth s'il y en a un dans l'URL,
