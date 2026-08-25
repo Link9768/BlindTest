@@ -120,6 +120,15 @@
     #btn-spotify-login:hover { filter: brightness(1.1); }
     /* Connecté : le bouton devient un simple indicateur, plus un bouton d'action */
     #btn-spotify-login { text-decoration: none; justify-content: center; }
+    #login-hint {
+      font-size: 0.72rem;
+      line-height: 1.45;
+      opacity: 0.65;
+      text-align: center;
+      max-width: 320px;
+      margin-top: -18px;
+    }
+    #login-hint.hidden { display: none; }
     #btn-spotify-login.connected { cursor: default; opacity: 0.85; }
     /* Diagnostic : overlay fixe, visible quel que soit le scroll de la page */
     #diag {
@@ -455,6 +464,7 @@
   <div id="screen-menu" class="screen visible">
     <h1>DJ Set</h1>
     <a id="btn-spotify-login" href="#" onclick="return spotifyLogin(event)">● Connexion Spotify</a>
+    <p id="login-hint">Connecte-toi avec <strong>email + mot de passe</strong>.<br>Avec Facebook ou Google, le navigateur bascule vers une autre appli et la connexion est perdue.</p>
     <div id="themes-grid"><!-- généré par JS --></div>
   </div>
   <!-- Overlay de diagnostic : hors des écrans, position fixe -->
@@ -1273,6 +1283,8 @@
       btn.textContent = useSdk ? '✓ Spotify connecté — morceaux complets' : '● Connexion Spotify';
       // C'est un <a>, pas un <button> : on neutralise le lien via la classe
       btn.classList.toggle('connected', useSdk);
+      const hint = document.getElementById('login-hint');
+      if (hint) hint.classList.toggle('hidden', useSdk);
       if (useSdk) btn.removeAttribute('href');
       else if (authUrlReady) btn.setAttribute('href', authUrlReady.url);
     }
