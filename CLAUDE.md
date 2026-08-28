@@ -16,17 +16,17 @@ Application web mobile (fichier HTML unique) utilisée pendant un DJ set comme o
 1. **Menu** (`#screen-menu`) : grille de 10 tuiles thèmes + bouton "Connexion Spotify" (ouvre `accounts.spotify.com/login` — une fois connecté dans le navigateur, les embeds jouent les morceaux complets depuis le début, pour toute la session)
 2. **Player** (`#screen-player`) : carrousel disques vinyle superposés, bandeau "Voir la réponse" pleine largeur, bouton play central avec anneau timer vert, bouton "← Menu", "Suivant →"
 
-### Thèmes (35)
+### Thèmes (36)
 
-Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Chanteur, Réalisateur, Groupe 1-3, Film 1-2, Séries 1-4, Pays 1-2, Sport, Décennie, Hommes et Femmes 1-4, Couleur, Vêtement, Prénom et nom 1-2, À ne pas faire 1-2, Il faut, Lieux 1-2, Jours, Biopic 1-4.
+Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Réalisateur, Groupe 1-3, Film 1-2, Séries 1-4, Pays 1-2, Sport, Décennie, Hommes et Femmes 1-4, Couleur, Vêtement, Prénom et nom 1-2, À ne pas faire 1-2, Il faut, Lieux 1-2, Jours, Biopic 1-4.
 
-**Créature supprimé** (2026-08-23, demande utilisateur). **Nom de famille renommé en Prénom et nom.**
+**Créature et Chanteur supprimés** (2026-08-23, demande utilisateur). **Nom de famille renommé en Prénom et nom.**
 
 Toute catégorie dont la liste fournie dépasse 7 morceaux → scindée en sous-catégories numérotées (Séries, Pays, Film, Groupe, Hommes et Femmes, À ne pas faire, Lieux, Biopic). Pattern à réutiliser systématiquement.
 
 Renseignés complets ✅ : Animaux, Météo/Saisons, Partie du corps, Hommes et Femmes 1-2, Réalisateur, Film 1, Séries 2, Pays 1, Groupe 1-3, Lieux 1, Biopic 2.
 Partiels : Créature (2/7), Chiffre/Nombre (6/7), Film 2 (6/7), Séries 1 (6/7), Séries 3 (5/7), Séries 4 (3/7), Pays 2 (4/7), Sport (6/7), Hommes et Femmes 3 (6/7), Hommes et Femmes 4 (5/7), Couleur (6/7), Vêtement (2 confirmés + 1 flag), Nom de famille (6/7, réponses déduites), À ne pas faire 1 (6/7 + 1 flag), À ne pas faire 2 (2/7), Il faut (2/7, réponses déduites), Lieux 2 (3/7), Jours (3/7), Biopic 1 (6/7 + 1 flag), Biopic 3 (6/7).
-Vides : Chanteur, Décennie.
+Vides : Décennie.
 
 ⚠️ **Points à vérifier avec l'utilisateur** :
 - ~~Biopic 1 #5 Rocketman~~ corrigé, ID complet fourni.
