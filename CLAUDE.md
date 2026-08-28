@@ -16,9 +16,11 @@ Application web mobile (fichier HTML unique) utilisée pendant un DJ set comme o
 1. **Menu** (`#screen-menu`) : grille de 10 tuiles thèmes + bouton "Connexion Spotify" (ouvre `accounts.spotify.com/login` — une fois connecté dans le navigateur, les embeds jouent les morceaux complets depuis le début, pour toute la session)
 2. **Player** (`#screen-player`) : carrousel disques vinyle superposés, bandeau "Voir la réponse" pleine largeur, bouton play central avec anneau timer vert, bouton "← Menu", "Suivant →"
 
-### Thèmes (37)
+### Thèmes (35)
 
-Créature, Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Chanteur, Réalisateur, Groupe 1-3, Film 1-2, Séries 1-4, Pays 1-2, Sport, Décennie, Hommes et Femmes 1-4, Couleur, Vêtement, Nom de famille, À ne pas faire 1-2, Il faut, Lieux 1-2, Jours, Biopic 1-3.
+Animaux, Météo/Saisons, Chiffre/Nombre, Partie du corps, Chanteur, Réalisateur, Groupe 1-3, Film 1-2, Séries 1-4, Pays 1-2, Sport, Décennie, Hommes et Femmes 1-4, Couleur, Vêtement, Prénom et nom 1-2, À ne pas faire 1-2, Il faut, Lieux 1-2, Jours, Biopic 1-4.
+
+**Créature supprimé** (2026-08-23, demande utilisateur). **Nom de famille renommé en Prénom et nom.**
 
 Toute catégorie dont la liste fournie dépasse 7 morceaux → scindée en sous-catégories numérotées (Séries, Pays, Film, Groupe, Hommes et Femmes, À ne pas faire, Lieux, Biopic). Pattern à réutiliser systématiquement.
 
