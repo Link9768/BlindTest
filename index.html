@@ -151,6 +151,62 @@
       gap: 8px;
     }
     #btn-suggestion:hover { background: rgba(255,255,255,0.2); }
+    #menu-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #btn-faq {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 30px;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 10px 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #btn-faq:hover { background: rgba(255,255,255,0.2); }
+    #faq-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,0.7);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #faq-modal.visible { display: flex; }
+    #faq-content {
+      background: #12203a;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 480px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      color: #fff;
+    }
+    #faq-content h2 { margin-bottom: 14px; }
+    #faq-content ol { padding-left: 20px; line-height: 1.5; }
+    #faq-content ol li { margin-bottom: 14px; }
+    #faq-content ul { padding-left: 18px; margin-top: 6px; }
+    #faq-content ul li { margin-bottom: 6px; }
+    #faq-close {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
     /* Diagnostic : overlay fixe, visible quel que soit le scroll de la page */
     #diag {
       display: none;
@@ -487,11 +543,33 @@
     <a id="btn-spotify-login" href="#" onclick="return spotifyLogin(event)">● Connexion Spotify</a>
     <p id="login-hint">Connecte-toi avec <strong>email + mot de passe</strong>.<br>Avec Facebook ou Google, le navigateur bascule vers une autre appli et la connexion est perdue.</p>
     <p id="suggestion-text">Vous pouvez me soumettre des thèmes et des chansons soit par ce mail (bataille.jules@gmail.com) soit en remplissant ce Google Form.</p>
-    <a id="btn-suggestion" href="https://docs.google.com/forms/d/e/1FAIpQLSfp7EyzVhj4hUaqBi7DrRtkXnLKkl9e7sm1LlV2b7-DwD9Xdw/viewform" target="_blank" rel="noopener">💡 Proposer un morceau</a>
+    <div id="menu-actions">
+      <a id="btn-suggestion" href="https://docs.google.com/forms/d/e/1FAIpQLSfp7EyzVhj4hUaqBi7DrRtkXnLKkl9e7sm1LlV2b7-DwD9Xdw/viewform" target="_blank" rel="noopener">💡 Proposer un morceau</a>
+      <button id="btn-faq" onclick="document.getElementById('faq-modal').classList.add('visible')">❓ FAQ</button>
+    </div>
     <div id="themes-grid"><!-- généré par JS --></div>
   </div>
   <!-- Overlay de diagnostic : hors des écrans, position fixe -->
   <p id="diag"></p>
+
+  <!-- ═══════════ MODALE FAQ ═══════════ -->
+  <div id="faq-modal">
+    <div id="faq-content">
+      <button id="faq-close" onclick="document.getElementById('faq-modal').classList.remove('visible')">✕</button>
+      <h2>FAQ</h2>
+      <ol>
+        <li>Pour le bon fonctionnement de l'app, connectez votre Spotify. Il est recommandé d'avoir Spotify Premium sinon les morceaux ne commenceront pas au début et ne seront que des extraits de 30 secondes.</li>
+        <li>Sur téléphone, évitez les navigateurs sous adblock ou même Chrome, car ça empêche la connexion de votre compte Spotify.</li>
+        <li>Utilisez Firefox et suivez ces directives pour régler le problème de connexion du bouton Spotify :
+          <ul>
+            <li>Décochez d'abord le réglage Firefox : Paramètres → Général → "Ouvrir les liens dans les applications" → Jamais (sinon Facebook interceptera encore).</li>
+            <li>Ouvrez l'app, cliquez "Connexion Spotify".</li>
+            <li>Sur la page Spotify, descendez jusqu'au formulaire email/mot de passe.</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+  </div>
 
   <!-- ═══════════ ÉCRAN PLAYER ═══════════ -->
   <div id="screen-player" class="screen">
