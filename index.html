@@ -511,6 +511,23 @@
   </div>
 
   <script>
+    // Auto-mise à jour : vérifie version.json (jamais mis en cache par le navigateur
+    // grâce au paramètre timestamp) et recharge la page si une nouvelle version a été
+    // publiée sur GitHub. Permet aux favoris de rester à jour sans que l'utilisateur
+    // ait à connaître le fonctionnement du cache navigateur.
+    (async () => {
+      try {
+        const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
+        const { v } = await res.json();
+        const seen = localStorage.getItem('djset_v');
+        if (seen && seen !== String(v)) {
+          localStorage.setItem('djset_v', String(v));
+          location.reload(true);
+          return;
+        }
+        localStorage.setItem('djset_v', String(v));
+      } catch (e) { /* pas grave si ça échoue, l'app fonctionne quand même */ }
+    })();
     // Capte toute erreur JS et l'affiche à l'écran (console inaccessible sur mobile)
     window.addEventListener('error', (e) => {
       const el = document.getElementById('diag');

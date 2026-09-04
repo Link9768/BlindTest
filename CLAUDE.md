@@ -9,6 +9,12 @@ Application web mobile (fichier HTML unique) utilisée pendant un DJ set comme o
 - **V1** : `../app DJ set.html` — version mono-thème (Créature), fonctionnelle, **ne pas modifier**
 - **V2** : `index.html` — version multi-thèmes, design inspiré de djset.olemains.com. Renommé depuis `app DJ set v2.html` (URL propre sans espaces, requis pour l'OAuth Spotify). URL en ligne : `https://link9768.github.io/DJSet/`
 
+## Auto-mise à jour (favoris toujours à jour)
+
+GitHub Pages ne permet pas de configurer les headers de cache HTTP. Solution : `version.json` (`{"v": N}`) + script en tête d'`index.html` qui compare la version stockée en `localStorage` à celle du fichier (fetché avec `cache: 'no-store'`) et force un `location.reload(true)` si elle a changé.
+
+**⚠️ Obligatoire à chaque mise à jour poussée** : incrémenter `v` dans `version.json`, sinon les navigateurs des amis (favoris) ne rechargeront jamais la nouvelle version.
+
 ## V2 — Architecture (fichier unique)
 
 ### Écrans (show/hide, pas de routing)
