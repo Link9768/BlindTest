@@ -1389,7 +1389,11 @@
       if (useSdk) {
         const state = await sdkPlayer.getCurrentState();
         // Rien en cours (ou autre morceau) → on démarre celui-ci depuis le début
-        if (!state || state.track_window?.current_track?.uri !== currentUri) {
+        // Spotify peut "relinker" un titre vers un autre ID (réédition) : l'URI
+        // renvoyée par le SDK diffère alors de la nôtre → on compare aussi linked_from
+        const ct = state?.track_window?.current_track;
+        const sameTrack = ct && (ct.uri === currentUri || ct.linked_from?.uri === currentUri);
+        if (!sameTrack) {
           const token = await getToken();
           await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${sdkDeviceId}`, {
             method: 'PUT',
